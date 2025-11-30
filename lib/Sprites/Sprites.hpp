@@ -1,28 +1,20 @@
+#ifndef SPRITES_HPP
+#define SPRITES_HPP
+
 #include <Arduino.h>
+
+#define SPRITE_WIDTH 16
+#define SPRITE_HEIGHT 16
 
 #define FACE_WIDTH 8
 #define FACE_HEIGHT 4
 
-// 'face_idle', 8x4px
-static const uint8_t PROGMEM sprite_face_idle [] = {
-    0x42, 0x42, 0x00, 0x3c
-};
-// 'face_blink', 8x4px
-static const uint8_t PROGMEM sprite_face_blink[] = {
-	0x00, 0xe7, 0x00, 0x3c
-};
-// 'face_happy', 8x4px
-static const uint8_t PROGMEM sprite_face_happy [] = {
-	0x42, 0xa5, 0x00, 0x18
-};
-// 'face_sad', 8x4px
-static const uint8_t PROGMEM sprite_face_sad [] = {
-	0xc3, 0xc3, 0x3c, 0x42
-};
-// 'face_surprised', 8x4px
-static const uint8_t PROGMEM sprite_face_surprised [] = {
-	0x42, 0x42, 0x18, 0x18
-};
+// Faces
+extern const uint8_t sprite_face_idle[] PROGMEM;
+extern const uint8_t sprite_face_blink[] PROGMEM;
+extern const uint8_t sprite_face_happy[] PROGMEM;
+extern const uint8_t sprite_face_sad[] PROGMEM;
+extern const uint8_t sprite_face_surprised[] PROGMEM;
 
 #define FACE_COUNT 5
 #define FACE_IDLE 0
@@ -30,62 +22,29 @@ static const uint8_t PROGMEM sprite_face_surprised [] = {
 #define FACE_HAPPY 2
 #define FACE_SAD 3
 #define FACE_SURPRISED 4
-const uint8_t* sprite_faces[5] = {
-	sprite_face_idle,
-	sprite_face_blink,
-	sprite_face_happy,
-	sprite_face_sad,
-	sprite_face_surprised
-};
 
+extern const uint8_t* const sprite_faces[FACE_COUNT];
+
+// Bodies
+extern const uint8_t sprite_body_1[] PROGMEM;
+extern const uint8_t sprite_body_2[] PROGMEM;
+extern const uint8_t sprite_body_3[] PROGMEM;
+extern const uint8_t sprite_body_4[] PROGMEM;
+
+#define BODY_COUNT 4
 #define BODY_WIDTH 16
 #define BODY_HEIGHT 8
+extern const uint8_t* const sprite_bodies[BODY_COUNT];
 
-// 'body_1', 16x8px
-const unsigned char sprite_body_1 [] PROGMEM = {
-	0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x1f, 0xf8, 0x00, 0x00
-};
-// 'body_2', 16x8px
-const unsigned char sprite_body_2 [] PROGMEM = {
-	0x20, 0x04, 0x40, 0x02, 0x40, 0x02, 0x40, 0x02, 0x43, 0xc2, 0x2c, 0x34, 0x10, 0x08, 0x00, 0x00
-};
-// 'body_3', 16x8px
-const unsigned char sprite_body_3 [] PROGMEM = {
-	0x60, 0x06, 0xc0, 0x03, 0xe0, 0x07, 0x20, 0x04, 0x60, 0x06, 0xc0, 0x03, 0x80, 0x01, 0xff, 0xff
-};
-// 'body_4', 16x8px
-const unsigned char sprite_body_4 [] PROGMEM = {
-	0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x42, 0x42, 0x52, 0x4a, 0x5a, 0x5a, 0x6e, 0x76
-};
+// Heads
+extern const uint8_t sprite_head_1[] PROGMEM;
+extern const uint8_t sprite_head_2[] PROGMEM;
+extern const uint8_t sprite_head_3[] PROGMEM;
 
-// Array of all bitmaps for convenience. (Total bytes used to store images in PROGMEM = 128)
-#define BODY_COUNT 4
-const unsigned char* sprite_bodies[BODY_COUNT] = {
-	sprite_body_1,
-	sprite_body_2,
-	sprite_body_3,
-	sprite_body_4
-};
-
+#define HEAD_COUNT 3
 #define HEAD_WIDTH 16
 #define HEAD_HEIGHT 8
 
-// 'head_1', 16x8px
-const unsigned char sprite_head_1 [] PROGMEM = {
-	0x0f, 0xf0, 0x10, 0x08, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04
-};
-// 'head_3', 16x8px
-const unsigned char sprite_head_3 [] PROGMEM = {
-	0x03, 0xc0, 0x1c, 0x38, 0x60, 0x06, 0xa0, 0x05, 0xa0, 0x05, 0xa0, 0x05, 0x60, 0x06, 0x20, 0x04
-};
-// 'head_2', 16x8px
-const unsigned char sprite_head_2 [] PROGMEM = {
-	0x60, 0x06, 0x9f, 0xf9, 0x80, 0x01, 0x40, 0x02, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04, 0x20, 0x04
-};
+extern const uint8_t* const sprite_heads[HEAD_COUNT];
 
-#define HEAD_COUNT 3
-const unsigned char* sprite_bodies[HEAD_COUNT] = {
-	sprite_head_1,
-	sprite_head_2,
-	sprite_head_3,
-};
+#endif
