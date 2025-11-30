@@ -13,6 +13,8 @@ class Pet {
     Adafruit_SSD1306 *display_driver;
     uint8_t const *body, *head;
 
+    uint8_t face = FACE_IDLE;
+
     uint8_t x, y;
 
     public:

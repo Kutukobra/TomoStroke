@@ -11,4 +11,5 @@ void Pet::draw() {
     // Head
     display_driver->drawBitmap(x - SPRITE_WIDTH / 2, y - SPRITE_HEIGHT / 2, head, HEAD_WIDTH, HEAD_HEIGHT, SSD1306_INVERSE);
     display_driver->drawBitmap(x - SPRITE_WIDTH / 2, y, body, BODY_WIDTH, BODY_HEIGHT, SSD1306_INVERSE);
+    display_driver->drawBitmap(x - SPRITE_WIDTH / 4, y - SPRITE_HEIGHT / 4, sprite_faces[face], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
 }
