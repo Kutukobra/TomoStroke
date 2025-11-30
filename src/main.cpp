@@ -19,10 +19,26 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 Pet *pet;
 
+QueueHandle_t voiceQueue;
+
+void VoiceTask(void*) {
+    VoiceMessage message;
+
+    while (1) {
+        if (xQueueReceive(voiceQueue, &message, portMAX_DELAY) == pdTRUE) {
+            for (uint8_t i = 0; i < message.voiceLength * 2; i += 2) {
+                tone(BUZZER, message.voice[i], message.voice[i + 1]);
+                vTaskDelay(message.voice[i + 1]);
+            }
+        }
+        noTone(BUZZER);
+    }
+}
 
 void setup()
 {
     Serial.begin(115200);
+    randomSeed(analogRead(36));
 
     pinMode(BUTTON_A, INPUT_PULLUP);
     pinMode(BUZZER, OUTPUT);
@@ -34,9 +50,13 @@ void setup()
             ;
     }
 
-    pet = new Pet(&display);
+    
+    
+    voiceQueue = xQueueCreate(20, sizeof(VoiceMessage));
 
-    randomSeed(analogRead(0));
+    pet = new Pet(&display, voiceQueue);
+
+    xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
 }
 
 

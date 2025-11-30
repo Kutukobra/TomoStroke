@@ -16,15 +16,25 @@ typedef struct Vector2D {
 #define BLINK_MAX 5000
 #define BLINK_CLOSED_DEFAULT 100
 
-#define SPEAK_MIN 10000
-#define SPEAK_MAX 120000
-#define SPEAK_INTERVAL_OFFSET 3000
+#define SPEAK_MIN 1000
+#define SPEAK_MAX 12000
+#define SPEAK_INTERVAL_OFFSET 300
 
+#define VOICE_LENGTH_MAX 5
 #define TONE_MIN 500
 #define TONE_MAX 1500
+#define TONE_DURATION_DEFAULT 100
+#define TONE_DURATION_OFFSET 20
+
+typedef struct VoiceMessage {
+    uint32_t *voice;
+    uint8_t voiceLength;
+} VoiceMessage;
 
 class Pet {
-    Adafruit_SSD1306 *display_driver;
+    Adafruit_SSD1306 *displayDriver;
+    QueueHandle_t voiceQueue;
+
     uint8_t body, head, face = FACE_IDLE; // Look index
 
     Vector2D position, velocity = {0, 0};
@@ -36,12 +46,15 @@ class Pet {
 
     uint64_t speakLast = 0, speakInterval;
     void _speakCheck();
-    uint32_t 
+    uint8_t voiceLength;
+    uint32_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
+    void _generateVoice();
+    void _speakVoice();
 
     bool isHighlighted = false;
 
     public:
-        Pet(Adafruit_SSD1306 *display);
+        Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceQueue);
 
         void update();
         void draw();
