@@ -17,7 +17,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUTTON_A 16
 #define BUZZER 4
 
-Pet pet(&display);
+Pet *pet;
 
 void setup()
 {
@@ -32,13 +32,23 @@ void setup()
             ;
     }
 
+    pet = new Pet(&display);
+
     randomSeed(analogRead(0));
 }
 
 
 void loop()
 {
+    if (digitalRead(BUTTON_A) == LOW) {
+        Serial.println("Pet Jumped!");
+        pet->jump();
+    }
+    
     display.clearDisplay();
-    pet.draw();
+    pet->update();
+    pet->draw();
     display.display();
+
+    delay(40);
 }
