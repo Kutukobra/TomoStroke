@@ -10,6 +10,16 @@ typedef struct Vector2D {
     int8_t x, y;
 } Vector2D;
 
+#define GRAVITY 3
+
+#define BLINK_MIN 1000
+#define BLINK_MAX 5000
+#define BLINK_CLOSED_DEFAULT 100
+
+#define SPEAK_MIN 10000
+#define SPEAK_MAX 120000
+#define SPEAK_INTERVAL_OFFSET 3000
+
 #define TONE_MIN 500
 #define TONE_MAX 1500
 
@@ -21,8 +31,14 @@ class Pet {
 
     uint64_t blinkLast = 0, blinkInterval;
     bool eyeClosed = false;
-
+    
     void _blinkCheck();
+
+    uint64_t speakLast = 0, speakInterval;
+    void _speakCheck();
+    uint32_t 
+
+    bool isHighlighted = false;
 
     public:
         Pet(Adafruit_SSD1306 *display);
@@ -35,5 +51,7 @@ class Pet {
 
         void jump();
 };
+
+
 
 #endif

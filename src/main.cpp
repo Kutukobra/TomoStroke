@@ -19,11 +19,13 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 Pet *pet;
 
+
 void setup()
 {
     Serial.begin(115200);
 
     pinMode(BUTTON_A, INPUT_PULLUP);
+    pinMode(BUZZER, OUTPUT);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
@@ -49,6 +51,6 @@ void loop()
     pet->update();
     pet->draw();
     display.display();
-
+    
     delay(40);
 }
