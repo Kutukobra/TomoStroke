@@ -16,15 +16,15 @@ typedef struct Vector2D {
 #define BLINK_MAX 5000
 #define BLINK_CLOSED_DEFAULT 100
 
-#define SPEAK_MIN 1000
-#define SPEAK_MAX 12000
-#define SPEAK_INTERVAL_OFFSET 300
+#define SPEAK_MIN 12000
+#define SPEAK_MAX 120000
+#define SPEAK_INTERVAL_OFFSET 3000
 
-#define VOICE_LENGTH_MAX 5
-#define TONE_MIN 500
-#define TONE_MAX 1500
-#define TONE_DURATION_DEFAULT 100
-#define TONE_DURATION_OFFSET 20
+#define VOICE_LENGTH_MAX 6
+#define TONE_MIN 900
+#define TONE_MAX 3000
+#define TONE_DURATION_DEFAULT 60
+#define TONE_DURATION_OFFSET 40
 
 typedef struct VoiceMessage {
     uint32_t *voice;

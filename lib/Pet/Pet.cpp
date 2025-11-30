@@ -72,7 +72,7 @@ void Pet::_speakVoice() {
 }
 
 void Pet::_generateVoice() {
-    voiceLength = random(1, VOICE_LENGTH_MAX);
+    voiceLength = random(2, VOICE_LENGTH_MAX);
 
     for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
         voice[i] = random(TONE_MIN, TONE_MAX);
