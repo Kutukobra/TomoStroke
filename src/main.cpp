@@ -39,6 +39,7 @@ void setup()
 void loop()
 {
     display.clearDisplay();
+    pet.update();
     pet.draw();
     display.display();
 }

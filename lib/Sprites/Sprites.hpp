@@ -9,6 +9,9 @@
 #define FACE_WIDTH 8
 #define FACE_HEIGHT 4
 
+#define IDLE_FRAME_COUNT 2
+extern const uint8_t* const sprite_bodies_idle[IDLE_FRAME_COUNT];
+
 // Faces
 extern const uint8_t sprite_face_idle[] PROGMEM;
 extern const uint8_t sprite_face_blink[] PROGMEM;

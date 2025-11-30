@@ -57,3 +57,8 @@ const uint8_t* const sprite_heads[HEAD_COUNT] = {
     sprite_head_2,
     sprite_head_3,
 };
+
+const uint8_t* const sprite_bodies_idle[IDLE_FRAME_COUNT] = {
+    sprite_body_1,
+    sprite_body_2
+};
