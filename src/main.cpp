@@ -59,15 +59,18 @@ void setup()
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
 }
 
-
 void loop()
 {
-    if (digitalRead(BUTTON_A) == LOW) {
-        Serial.println("Pet Jumped!");
-        pet->jump();
+    static uint64_t lastDebounce;
+    static uint64_t lastVibration;
+
+    if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > 200) {
+        lastDebounce = millis();
+        pet->toggleHighlight();
     }
 
-    if (digitalRead(VIBRATION_SENSOR) == HIGH) {
+    if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > 200) {
+        lastVibration = millis();
         pet->speak();
     }
     
@@ -76,5 +79,5 @@ void loop()
     pet->draw();
     display.display();
     
-    delay(40);
+    delay(80);
 }

@@ -27,7 +27,7 @@ typedef struct Vector2D {
 #define TONE_DURATION_OFFSET 40
 
 typedef struct VoiceMessage {
-    uint32_t *voice;
+    uint16_t *voice;
     uint8_t voiceLength;
 } VoiceMessage;
 
@@ -47,7 +47,7 @@ class Pet {
     uint64_t speakLast = 0, speakInterval;
     void _speakCheck();
     uint8_t voiceLength;
-    uint32_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
+    uint16_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
     void _generateVoice();
     
     bool isHighlighted = false;
@@ -62,7 +62,9 @@ class Pet {
         Vector2D getPosition();
         
         void speak();
-        void jump();
+
+        void setHighlight(bool isHighlighted);
+        void toggleHighlight();
 };
 
 

@@ -7,7 +7,7 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDr
 
     speakInterval = random(SPEAK_MIN, SPEAK_MAX);
 
-    position = {64, 32};
+    position = {(int8_t)random(8, 120), (int8_t)random(8, 52)};
 
     _generateVoice();
 
@@ -22,19 +22,21 @@ void Pet::update() {
     _blinkCheck();
     _speakCheck();
 
-    // Position
-    velocity.y += GRAVITY;
-
-    position.x += velocity.x;
-    position.y += velocity.y;
 
     if (position.y - SPRITE_HEIGHT / 2 <= 16) { // Limit top bar
         position.y = SPRITE_HEIGHT / 2 + 16;
     }
     
     if (position.y + SPRITE_HEIGHT / 2 >= 64) {
-        velocity.y = 0;
         position.y = 63 - SPRITE_HEIGHT / 2;
+    }
+
+    if (position.x + SPRITE_WIDTH / 2 >= 128) {
+        position.x = 128 - SPRITE_WIDTH / 2;
+    }
+
+    if (position.x - SPRITE_WIDTH / 2 <= 0) {
+        position.x = SPRITE_WIDTH / 2;
     }
 }
 
@@ -68,7 +70,6 @@ void Pet::speak() {
     message.voiceLength = voiceLength;
     message.voice = voice;
     xQueueSend(voiceQueue, &message, 10);
-    Serial.println("Pet Spoke.");
 }
 
 void Pet::_generateVoice() {
@@ -92,7 +93,7 @@ void Pet::draw() {
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[drawFace], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
 
     if (isHighlighted) {
-        displayDriver->drawRect(position.x - SPRITE_WIDTH / 2, position.y - SPRITE_HEIGHT / 2, 32, 32, SSD1306_INVERSE);
+        displayDriver->drawRect(position.x - SPRITE_WIDTH / 2 - 2, position.y - SPRITE_HEIGHT / 2 - 2, 20, 20, SSD1306_INVERSE);
     }
 }
 
@@ -104,6 +105,10 @@ Vector2D Pet::getPosition() {
     return position;
 }
 
-void Pet::jump() {
-    velocity.y = -10;
+void Pet::setHighlight(bool highlighted) {
+    isHighlighted = highlighted;
+}
+
+void Pet::toggleHighlight() {
+    isHighlighted = !isHighlighted;
 }
