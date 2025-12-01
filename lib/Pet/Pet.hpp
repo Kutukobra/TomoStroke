@@ -57,10 +57,15 @@ class Pet {
         
         void update();
         void draw();
+
+        void setLooks(uint8_t body, uint8_t head);
+
+        void setIntervals(uint64_t blinkInterval, uint64_t speakInterval);
         
         void setPosition(int8_t x, int8_t y);
         Vector2D getPosition();
         
+        void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
         void speak();
 
         void setHighlight(bool isHighlighted);

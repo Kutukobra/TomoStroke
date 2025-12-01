@@ -18,7 +18,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUZZER 4
 #define VIBRATION_SENSOR 5
 
-Pet *pet;
+#define PET_COUNT 5
+
+Pet *pets[PET_COUNT];
 
 QueueHandle_t voiceQueue;
 
@@ -54,7 +56,9 @@ void setup()
     
     voiceQueue = xQueueCreate(20, sizeof(VoiceMessage));
 
-    pet = new Pet(&display, voiceQueue);
+    for (int i = 0; i < PET_COUNT; i++) {
+        pets[i] = new Pet(&display, voiceQueue);
+    }
 
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
 }
@@ -63,20 +67,26 @@ void loop()
 {
     static uint64_t lastDebounce;
     static uint64_t lastVibration;
+    static uint8_t currentPet = 0;
 
     if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > 200) {
         lastDebounce = millis();
-        pet->toggleHighlight();
+        pets[currentPet]->setHighlight(false);
+        currentPet++;
+        if (currentPet >= PET_COUNT) currentPet = 0;
+        pets[currentPet]->setHighlight(true);
     }
 
     if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > 200) {
         lastVibration = millis();
-        pet->speak();
+        pets[currentPet]->speak();
     }
     
     display.clearDisplay();
-    pet->update();
-    pet->draw();
+    for (int i = 0; i < PET_COUNT; i++) {
+        pets[i]->update();
+        pets[i]->draw();
+    }
     display.display();
     
     delay(80);

@@ -7,14 +7,31 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDr
 
     speakInterval = random(SPEAK_MIN, SPEAK_MAX);
 
-    position = {(int8_t)random(8, 120), (int8_t)random(8, 52)};
+    position = {(int8_t)random(8, 120), (int8_t)random(8, 52)}; 
 
     _generateVoice();
 
-    Serial.printf("- New Pet\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\n", body, face, blinkInterval);
+    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\n", position.x, position.y, body, face, blinkInterval);
     Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
     for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
         Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
+    }
+}
+
+void Pet::setLooks(uint8_t body, uint8_t head) {
+    this->body = body;
+    this->head = head;
+}
+
+
+void Pet::setIntervals(uint64_t blinkInterval, uint64_t speakInterval) {
+    this->blinkInterval = blinkInterval;
+    this->speakInterval = speakInterval;
+}
+
+void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
+    for (int i = 0; i < VOICE_LENGTH_MAX * 2; i++) {
+        this->voice[i] = voice[i];
     }
 }
 
