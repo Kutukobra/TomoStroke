@@ -16,6 +16,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define BUTTON_A 16
 #define BUZZER 4
+#define VIBRATION_SENSOR 5
 
 Pet *pet;
 
@@ -42,15 +43,14 @@ void setup()
 
     pinMode(BUTTON_A, INPUT_PULLUP);
     pinMode(BUZZER, OUTPUT);
+    pinMode(VIBRATION_SENSOR, INPUT);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
         Serial.println(F("SSD1306 allocation failed"));
         for (;;)
             ;
-    }
-
-    
+    }    
     
     voiceQueue = xQueueCreate(20, sizeof(VoiceMessage));
 
@@ -65,6 +65,10 @@ void loop()
     if (digitalRead(BUTTON_A) == LOW) {
         Serial.println("Pet Jumped!");
         pet->jump();
+    }
+
+    if (digitalRead(VIBRATION_SENSOR) == HIGH) {
+        pet->speak();
     }
     
     display.clearDisplay();

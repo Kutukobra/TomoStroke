@@ -23,7 +23,7 @@ typedef struct Vector2D {
 #define VOICE_LENGTH_MAX 6
 #define TONE_MIN 900
 #define TONE_MAX 3000
-#define TONE_DURATION_DEFAULT 60
+#define TONE_DURATION_DEFAULT 100
 #define TONE_DURATION_OFFSET 40
 
 typedef struct VoiceMessage {
@@ -49,19 +49,19 @@ class Pet {
     uint8_t voiceLength;
     uint32_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
     void _generateVoice();
-    void _speakVoice();
-
+    
     bool isHighlighted = false;
-
+    
     public:
         Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceQueue);
-
+        
         void update();
         void draw();
-
+        
         void setPosition(int8_t x, int8_t y);
         Vector2D getPosition();
-
+        
+        void speak();
         void jump();
 };
 

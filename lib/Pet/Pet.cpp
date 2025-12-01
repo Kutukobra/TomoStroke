@@ -58,12 +58,12 @@ void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
     if (currentTime - speakLast >= speakInterval) {
-        _speakVoice();
+        speak();
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
     }
 }
 
-void Pet::_speakVoice() {
+void Pet::speak() {
     VoiceMessage message;
     message.voiceLength = voiceLength;
     message.voice = voice;
