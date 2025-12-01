@@ -49,6 +49,10 @@ class Pet {
     uint8_t voiceLength;
     uint16_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
     void _generateVoice();
+
+    uint8_t walkRate = 0;
+    Vector2D walkSetpoint;
+    void _walkCheck();
     
     bool isHighlighted = false;
     
@@ -70,6 +74,8 @@ class Pet {
 
         void setHighlight(bool isHighlighted);
         void toggleHighlight();
+
+    static Vector2D GetRandomPosition();
 };
 
 

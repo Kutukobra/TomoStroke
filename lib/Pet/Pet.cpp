@@ -7,11 +7,13 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDr
 
     speakInterval = random(SPEAK_MIN, SPEAK_MAX);
 
-    position = {(int8_t)random(8, 120), (int8_t)random(8, 52)}; 
+    position = GetRandomPosition();
+
+    walkRate = random(1, 101);
 
     _generateVoice();
 
-    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\n", position.x, position.y, body, face, blinkInterval);
+    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, body, face, blinkInterval, walkRate);
     Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
     for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
         Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
@@ -38,21 +40,29 @@ void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
 void Pet::update() {
     _blinkCheck();
     _speakCheck();
+    _walkCheck();
 
+    if (walkSetpoint.x > position.x) {
+        position.x += 1;
+    } else if (walkSetpoint.x < position.x) {
+        position.x -= 1;
+    }
+
+    if (walkSetpoint.y > position.y) {
+        position.y += 1;
+    } else if (walkSetpoint.y < position.y) {
+        position.y -= 1;
+    }
 
     if (position.y - SPRITE_HEIGHT / 2 <= 16) { // Limit top bar
         position.y = SPRITE_HEIGHT / 2 + 16;
-    }
-    
-    if (position.y + SPRITE_HEIGHT / 2 >= 64) {
+    } else if (position.y + SPRITE_HEIGHT / 2 >= 64) {
         position.y = 63 - SPRITE_HEIGHT / 2;
     }
 
     if (position.x + SPRITE_WIDTH / 2 >= 128) {
         position.x = 128 - SPRITE_WIDTH / 2;
-    }
-
-    if (position.x - SPRITE_WIDTH / 2 <= 0) {
+    } else if (position.x - SPRITE_WIDTH / 2 <= 0) {
         position.x = SPRITE_WIDTH / 2;
     }
 }
@@ -79,6 +89,13 @@ void Pet::_speakCheck() {
     if (currentTime - speakLast >= speakInterval) {
         speak();
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
+    }
+}
+
+void Pet::_walkCheck() {
+    uint16_t randomChance = random(1, 3001);
+    if (walkRate >= randomChance) {
+        walkSetpoint = GetRandomPosition();
     }
 }
 
@@ -128,4 +145,10 @@ void Pet::setHighlight(bool highlighted) {
 
 void Pet::toggleHighlight() {
     isHighlighted = !isHighlighted;
+}
+
+Vector2D Pet::GetRandomPosition() {
+    int8_t x = random(SPRITE_WIDTH / 2, 129 - SPRITE_WIDTH / 2);
+    int8_t y = random(SPRITE_HEIGHT / 2, 65 - SPRITE_HEIGHT / 2);
+    return (Vector2D){x, y};
 }
