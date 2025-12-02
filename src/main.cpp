@@ -24,7 +24,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define PET_COUNT 3
 
 Pet *pets[PET_COUNT];
-Bar hungerBar (&display, 1, 1, 62, 12, MAX_SATIATION, MAX_SATIATION);
+Bar hungerBar(&display, 1, 1, 62, 12, MAX_SATIATION, MAX_SATIATION);
+Bar happinessBar(&display, 65, 1, 62, 12, MAX_HAPPINESS, MAX_HAPPINESS);
+
+uint16_t feedingSound[] = {100, 20};
 
 QueueHandle_t voiceQueue;
 
@@ -49,6 +52,7 @@ void MainLoop(void *) {
 
     while (1) {
         hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
+        happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
 
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             lastDebounce = millis();
@@ -65,7 +69,6 @@ void MainLoop(void *) {
     
         if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
-            pets[currentPet]->speak(-1000);
             pets[currentPet]->feed(50);
         }
         
@@ -99,7 +102,7 @@ void setup()
             ;
     }    
     
-    voiceQueue = xQueueCreate(5, sizeof(VoiceMessage));
+    voiceQueue = xQueueCreate(3, sizeof(VoiceMessage));
 
     for (int i = 0; i < PET_COUNT; i++) {
         pets[i] = new Pet(&display, voiceQueue);
