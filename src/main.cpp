@@ -21,7 +21,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define INPUT_DEBOUNCE 100
 
-#define PET_COUNT 2
+#define PET_COUNT 3
 
 Pet *pets[PET_COUNT];
 Bar hungerBar (&display, 1, 1, 62, 12, MAX_SATIATION, MAX_SATIATION);

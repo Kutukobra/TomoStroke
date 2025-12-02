@@ -31,8 +31,9 @@ extern const uint8_t sprite_body_2[] PROGMEM;
 extern const uint8_t sprite_body_3[] PROGMEM;
 extern const uint8_t sprite_body_4[] PROGMEM;
 extern const uint8_t sprite_body_5[] PROGMEM;
+extern const uint8_t sprite_body_6[] PROGMEM;
 
-#define BODY_COUNT 5
+#define BODY_COUNT 6
 #define BODY_WIDTH 16
 #define BODY_HEIGHT 8
 extern const uint8_t* const sprite_bodies[BODY_COUNT];
@@ -43,8 +44,9 @@ extern const uint8_t sprite_head_2[] PROGMEM;
 extern const uint8_t sprite_head_3[] PROGMEM;
 extern const uint8_t sprite_head_4[] PROGMEM;
 extern const uint8_t sprite_head_5[] PROGMEM;
+extern const uint8_t sprite_head_6[] PROGMEM;
 
-#define HEAD_COUNT 5
+#define HEAD_COUNT 6
 #define HEAD_WIDTH 16
 #define HEAD_HEIGHT 8
 

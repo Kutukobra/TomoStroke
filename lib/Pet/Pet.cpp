@@ -55,8 +55,8 @@ void Pet::update() {
         position.y -= 1;
     }
 
-    if (position.y - SPRITE_HEIGHT / 2 <= 16) { // Limit top bar
-        position.y = SPRITE_HEIGHT / 2 + 16;
+    if (position.y - SPRITE_HEIGHT / 2 <= 18) { // Limit top bar
+        position.y = SPRITE_HEIGHT / 2 + 18;
     } else if (position.y + SPRITE_HEIGHT / 2 >= 64) {
         position.y = 63 - SPRITE_HEIGHT / 2;
     }
