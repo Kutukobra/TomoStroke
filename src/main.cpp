@@ -18,7 +18,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUZZER 4
 #define VIBRATION_SENSOR 5
 
-#define PET_COUNT 5
+#define PET_COUNT 2
 
 Pet *pets[PET_COUNT];
 
@@ -35,6 +35,35 @@ void VoiceTask(void*) {
             }
         }
         noTone(BUZZER);
+    }
+}
+
+void MainLoop(void *) {
+    uint64_t lastDebounce;
+    uint64_t lastVibration;
+    uint8_t currentPet = 0;
+
+    while (1) {
+        if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > 200) {
+            lastDebounce = millis();
+            pets[currentPet]->setHighlight(false);
+            currentPet++;
+            if (currentPet >= PET_COUNT) currentPet = 0;
+            pets[currentPet]->setHighlight(true);
+        }
+    
+        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > 200) {
+            lastVibration = millis();
+            pets[currentPet]->speak();
+        }
+        
+        display.clearDisplay();
+        for (int i = 0; i < PET_COUNT; i++) {
+            pets[i]->update();
+            pets[i]->draw();
+        }
+        display.display();
+        vTaskDelay(pdMS_TO_TICKS(40));
     }
 }
 
@@ -60,34 +89,11 @@ void setup()
         pets[i] = new Pet(&display, voiceQueue);
     }
 
+    xTaskCreate(MainLoop, "Main Loop", 8192, NULL, 2, NULL);
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
 }
 
 void loop()
 {
-    static uint64_t lastDebounce;
-    static uint64_t lastVibration;
-    static uint8_t currentPet = 0;
-
-    if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > 200) {
-        lastDebounce = millis();
-        pets[currentPet]->setHighlight(false);
-        currentPet++;
-        if (currentPet >= PET_COUNT) currentPet = 0;
-        pets[currentPet]->setHighlight(true);
-    }
-
-    if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > 200) {
-        lastVibration = millis();
-        pets[currentPet]->speak();
-    }
-    
-    display.clearDisplay();
-    for (int i = 0; i < PET_COUNT; i++) {
-        pets[i]->update();
-        pets[i]->draw();
-    }
-    display.display();
-    
-    delay(80);
+    // Jangan taro apapun di sini
 }
