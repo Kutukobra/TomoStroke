@@ -98,14 +98,14 @@ void Pet::_speakCheck() {
         isSpeaking = false;
     }
 
-    if (currentTime - speakLast >= speakIntervalModified) {
+    if (currentTime - speakLast > speakIntervalModified) {
         speak(isHungry ? TONE_HUNGRY_OFFSET : 0);
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
     }
 }
 
 void Pet::_walkCheck() {
-    uint16_t randomChance = random(1, 3001);
+    uint16_t randomChance = random(1, 6001);
     if (walkRate >= randomChance) {
         _satiationReduction(HUNGER_WALK);
         walkSetpoint = GetRandomPosition();
@@ -114,11 +114,12 @@ void Pet::_walkCheck() {
 
 void Pet::_satiationCheck() {
     uint64_t currentTime = millis();
-    if (currentTime - hungerLast >= HUNGER_DECAY) {
-        _happinessReduction(HUNGER_RATE);
+    if (currentTime - hungerLast >= HUNGER_RATE) {
+        _satiationReduction(HUNGER_DECAY);
         hungerLast = currentTime;
     }
-    if (satiation <= MAX_SATIATION /3) face = FACE_SAD;
+    if (satiation <= MAX_SATIATION / 3) face = FACE_SURPRISED;
+    else if (satiation >= MAX_SATIATION * 95 / 100) face = FACE_HAPPY;
 }
 
 void Pet::_happinessCheck() {
@@ -140,6 +141,7 @@ void Pet::speak(int16_t toneOffset) {
     message.voice = voice;
     message.toneOffset = toneOffset;
     xQueueSend(voiceQueue, &message, 10);
+    Serial.println("Pet spoke!");
 }
 
 void Pet::_generateVoice() {
@@ -183,11 +185,11 @@ void Pet::setHighlight(bool highlighted) {
     isHighlighted = highlighted;
 }
 
-uint16_t Pet::getHappiness() {
+int16_t Pet::getHappiness() {
     return happiness;
 }
 
-uint16_t Pet::getSatiation() {
+int16_t Pet::getSatiation() {
     return satiation;
 }
 
@@ -202,14 +204,15 @@ void Pet::_happinessReduction(uint16_t value) {
 }
 
 void Pet::feed(uint8_t value) {
-    satiation += value;
-    if (satiation >= MAX_SATIATION) satiation = MAX_SATIATION - 1;
-    else {
+    if (satiation < MAX_SATIATION) {
         VoiceMessage feeding;
         feeding.voiceLength = 1;
         feeding.voice = voice;
         xQueueSend(voiceQueue, &feeding, 10);
     }
+    
+    satiation += value;
+    if (satiation >= MAX_SATIATION) satiation = MAX_SATIATION;
 }
 
 void Pet::toggleHighlight() {
