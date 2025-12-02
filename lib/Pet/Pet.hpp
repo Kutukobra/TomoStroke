@@ -29,9 +29,9 @@ typedef struct Vector2D {
 #define TONE_LONELY_OFFSET -900
 
 #define MAX_SATIATION 1000
-#define HUNGER_RATE 1000
-#define HUNGER_DECAY 1
-#define HUNGER_WALK 6
+#define HUNGER_RATE 5000
+#define HUNGER_DECAY 3
+#define HUNGER_WALK 5
 
 #define MAX_HAPPINESS 1000
 
@@ -66,7 +66,7 @@ class Pet {
     void _walkCheck();
 
     uint16_t happiness = MAX_HAPPINESS;
-    uint16_t satiation = MAX_SATIATION;
+    int16_t satiation = MAX_SATIATION;
     uint64_t hungerLast = 0;
     void _satiationReduction(uint16_t value);
     void _satiationCheck();

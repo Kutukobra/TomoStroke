@@ -38,10 +38,11 @@ void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
 }
 
 void Pet::update() {
+    face = FACE_IDLE;
+    _satiationCheck();
     _blinkCheck();
     _speakCheck();
     _walkCheck();
-    _satiationCheck();
 
     if (walkSetpoint.x > position.x) {
         position.x += 1;
@@ -88,9 +89,11 @@ void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
     bool isHungry = satiation < MAX_SATIATION / 2;
-    uint64_t speakIntervalModified = (isHungry ? speakInterval / 4 : speakInterval);
+    uint64_t speakIntervalModified = (isHungry ? speakInterval / 10 : speakInterval);
 
-    if (isSpeaking && (currentTime - speakLast >= 100 * voiceLength)) {
+    if (isHungry) face = FACE_SAD;
+
+    if (isSpeaking && (currentTime - speakLast >= 200 * voiceLength)) {
         isSpeaking = false;
     }
 
@@ -114,6 +117,8 @@ void Pet::_satiationCheck() {
         _satiationReduction(HUNGER_DECAY);
         hungerLast = currentTime;
     }
+
+    if (satiation >= MAX_SATIATION * 9 / 10) face = FACE_HAPPY;
 }
 
 void Pet::speak(int16_t toneOffset) {
@@ -177,7 +182,7 @@ uint16_t Pet::getSatiation() {
 
 void Pet::_satiationReduction(uint16_t value) {
     satiation -= value;
-    if (satiation <= 0) satiation = 1;
+    if (satiation <= 1) satiation = 1;
 }
 
 void Pet::feed(uint8_t value) {
