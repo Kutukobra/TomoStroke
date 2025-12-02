@@ -34,7 +34,7 @@ void VoiceTask(void*) {
     while (1) {
         if (xQueueReceive(voiceQueue, &message, portMAX_DELAY) == pdTRUE) {
             for (uint8_t i = 0; i < message.voiceLength * 2; i += 2) {
-                tone(BUZZER, message.voice[i], message.voice[i + 1]);
+                tone(BUZZER, message.voice[i] + message.toneOffset, message.voice[i + 1]);
                 vTaskDelay(message.voice[i + 1]);
             }
         }
@@ -45,7 +45,7 @@ void VoiceTask(void*) {
 void MainLoop(void *) {
     uint64_t lastDebounce;
     uint64_t lastVibration;
-    uint8_t currentPet = 0;
+    uint8_t currentPet = PET_COUNT;
 
     while (1) {
         hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
@@ -65,8 +65,8 @@ void MainLoop(void *) {
     
         if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
-            pets[currentPet]->speak();
-            pets[currentPet]->feed(30);
+            pets[currentPet]->speak(-1000);
+            pets[currentPet]->feed(50);
         }
         
         display.clearDisplay();
@@ -75,7 +75,8 @@ void MainLoop(void *) {
             pets[i]->draw();
         }
 
-        GUI::DrawAll();
+        if (currentPet != PET_COUNT)
+            GUI::DrawAll();
 
         display.display();
         vTaskDelay(pdMS_TO_TICKS(40));
@@ -98,7 +99,7 @@ void setup()
             ;
     }    
     
-    voiceQueue = xQueueCreate(20, sizeof(VoiceMessage));
+    voiceQueue = xQueueCreate(5, sizeof(VoiceMessage));
 
     for (int i = 0; i < PET_COUNT; i++) {
         pets[i] = new Pet(&display, voiceQueue);

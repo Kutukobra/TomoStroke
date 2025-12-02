@@ -21,22 +21,24 @@ typedef struct Vector2D {
 #define SPEAK_INTERVAL_OFFSET 3000
 
 #define VOICE_LENGTH_MAX 6
-#define TONE_MIN 300
-#define TONE_MAX 3000
+#define TONE_MIN 1000
+#define TONE_MAX 2000
 #define TONE_DURATION_DEFAULT 100
 #define TONE_DURATION_OFFSET 40
+#define TONE_HUNGRY_OFFSET 500
+#define TONE_LONELY_OFFSET -900
 
 #define MAX_SATIATION 1000
 #define HUNGER_RATE 1000
 #define HUNGER_DECAY 1
-#define HUNGER_SPEAK 8
-#define HUNGER_WALK 3
+#define HUNGER_WALK 6
 
 #define MAX_HAPPINESS 1000
 
 typedef struct VoiceMessage {
     uint16_t *voice;
     uint8_t voiceLength;
+    int8_t toneOffset;
 } VoiceMessage;
 
 class Pet {
@@ -85,7 +87,7 @@ class Pet {
         Vector2D getPosition();
         
         void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
-        void speak();
+        void speak(int16_t toneOffset = 0);
 
         uint16_t getHappiness();
         uint16_t getSatiation();

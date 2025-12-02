@@ -87,12 +87,15 @@ void Pet::_blinkCheck() {
 void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
+    bool isHungry = satiation < MAX_SATIATION / 2;
+    uint64_t speakIntervalModified = (isHungry ? speakInterval / 4 : speakInterval);
+
     if (isSpeaking && (currentTime - speakLast >= 100 * voiceLength)) {
         isSpeaking = false;
     }
 
-    if (currentTime - speakLast >= speakInterval) {
-        speak();
+    if (currentTime - speakLast >= speakIntervalModified) {
+        speak(isHungry ? TONE_HUNGRY_OFFSET : 0);
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
     }
 }
@@ -113,13 +116,13 @@ void Pet::_satiationCheck() {
     }
 }
 
-void Pet::speak() {
-    _satiationReduction(HUNGER_SPEAK);
+void Pet::speak(int16_t toneOffset) {
     isSpeaking = true;
     speakLast = millis();
     VoiceMessage message;
     message.voiceLength = voiceLength;
     message.voice = voice;
+    message.toneOffset = toneOffset;
     xQueueSend(voiceQueue, &message, 10);
 }
 
