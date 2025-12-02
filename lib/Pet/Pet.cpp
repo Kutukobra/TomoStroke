@@ -135,6 +135,7 @@ void Pet::draw() {
     // Face
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[drawFace], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
 
+    // Highlight
     if (isHighlighted) {
         displayDriver->drawRect(position.x - SPRITE_WIDTH / 2 - 2, position.y - SPRITE_HEIGHT / 2 - 2, 20, 20, SSD1306_INVERSE);
     }
@@ -150,6 +151,10 @@ Vector2D Pet::getPosition() {
 
 void Pet::setHighlight(bool highlighted) {
     isHighlighted = highlighted;
+}
+
+uint16_t Pet::getHappiness() {
+    return happiness;
 }
 
 void Pet::toggleHighlight() {

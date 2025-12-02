@@ -26,6 +26,8 @@ typedef struct Vector2D {
 #define TONE_DURATION_DEFAULT 100
 #define TONE_DURATION_OFFSET 40
 
+#define MAX_HAPPINESS 1000
+
 typedef struct VoiceMessage {
     uint16_t *voice;
     uint8_t voiceLength;
@@ -54,6 +56,8 @@ class Pet {
     uint8_t walkRate = 0;
     Vector2D walkSetpoint;
     void _walkCheck();
+
+    uint16_t happiness = MAX_HAPPINESS;
     
     bool isHighlighted = false;
     
@@ -72,6 +76,8 @@ class Pet {
         
         void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
         void speak();
+
+        uint16_t getHappiness();
 
         void setHighlight(bool isHighlighted);
         void toggleHighlight();
