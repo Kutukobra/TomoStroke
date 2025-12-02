@@ -12,7 +12,7 @@ class Bar : GUI {
     public:
         Bar(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY, uint8_t width, uint8_t height, uint16_t currentCapacity, uint16_t maxCapacity);
 
-        void setCapacity(uint8_t newCapacity);
+        void setCapacity(uint16_t newCapacity);
 };
 
 #endif

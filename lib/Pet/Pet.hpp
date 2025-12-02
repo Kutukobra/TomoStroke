@@ -64,7 +64,7 @@ class Pet {
     void _walkCheck();
 
     uint16_t happiness = MAX_HAPPINESS;
-    uint16_t satiation = 0;
+    uint16_t satiation = MAX_SATIATION;
     uint64_t hungerLast = 0;
     void _satiationReduction(uint16_t value);
     void _satiationCheck();

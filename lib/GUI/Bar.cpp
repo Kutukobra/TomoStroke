@@ -13,7 +13,7 @@ void Bar::draw() {
     displayDriver->fillRect(posX + 2, posY + 2, contentWidth - 4, height - 4, SSD1306_INVERSE);
 }
 
-void Bar::setCapacity(uint8_t newCapacity) {
+void Bar::setCapacity(uint16_t newCapacity) {
     if (newCapacity > maxCapacity) {
         currentCapacity = maxCapacity;
         return;
