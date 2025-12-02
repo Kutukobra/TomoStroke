@@ -95,7 +95,8 @@ void setup()
         pets[i] = new Pet(&display, voiceQueue);
     }
 
-    new Bar(&display, 30, 16, 20, 20, 100, 100);
+    new Bar(&display, 1, 1, 62, 12, 30, 100);
+    new Bar(&display, 63, 1, 62, 12, 79, 100);
 
     xTaskCreate(MainLoop, "Main Loop", 8192, NULL, 2, NULL);
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);

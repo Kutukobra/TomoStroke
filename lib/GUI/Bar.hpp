@@ -10,7 +10,7 @@ class Bar : GUI {
     void draw() override;
 
     public:
-        Bar(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY,uint8_t height, uint8_t width, uint8_t maxCapacity, uint8_t currentCapacity);
+        Bar(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY, uint8_t width, uint8_t height, uint8_t currentCapacity, uint8_t maxCapacity);
 
         void setCapacity(uint8_t newCapacity);
 };
