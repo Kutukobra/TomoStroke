@@ -86,6 +86,10 @@ void Pet::_blinkCheck() {
 void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
+    if (isSpeaking && (currentTime - speakLast >= 100 * voiceLength)) {
+        isSpeaking = false;
+    }
+
     if (currentTime - speakLast >= speakInterval) {
         speak();
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
@@ -100,6 +104,8 @@ void Pet::_walkCheck() {
 }
 
 void Pet::speak() {
+    isSpeaking = true;
+    speakLast = millis();
     VoiceMessage message;
     message.voiceLength = voiceLength;
     message.voice = voice;
@@ -117,7 +123,10 @@ void Pet::_generateVoice() {
 
 void Pet::draw() {
 
-    uint8_t drawFace = eyeClosed ? FACE_BLINK : face;
+    uint8_t drawFace = face;
+
+    if (eyeClosed) drawFace = FACE_BLINK;
+    if (isSpeaking) drawFace = FACE_SURPRISED;
 
     // Head
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y - SPRITE_HEIGHT / 2, sprite_heads[head], HEAD_WIDTH, HEAD_HEIGHT, SSD1306_INVERSE);

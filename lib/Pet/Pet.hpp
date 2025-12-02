@@ -46,6 +46,7 @@ class Pet {
 
     uint64_t speakLast = 0, speakInterval;
     void _speakCheck();
+    bool isSpeaking = false;
     uint8_t voiceLength;
     uint16_t voice[VOICE_LENGTH_MAX * 2]; // Part pertama frekuensi, part dua duration
     void _generateVoice();

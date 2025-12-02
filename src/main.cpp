@@ -18,6 +18,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUZZER 4
 #define VIBRATION_SENSOR 5
 
+#define INPUT_DEBOUNCE 400
+
 #define PET_COUNT 2
 
 Pet *pets[PET_COUNT];
@@ -44,7 +46,7 @@ void MainLoop(void *) {
     uint8_t currentPet = 0;
 
     while (1) {
-        if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > 200) {
+        if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             lastDebounce = millis();
             pets[currentPet]->setHighlight(false);
             currentPet++;
@@ -52,7 +54,7 @@ void MainLoop(void *) {
             pets[currentPet]->setHighlight(true);
         }
     
-        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > 200) {
+        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
             pets[currentPet]->speak();
         }
