@@ -41,6 +41,7 @@ void Pet::update() {
     _blinkCheck();
     _speakCheck();
     _walkCheck();
+    _satiationCheck();
 
     if (walkSetpoint.x > position.x) {
         position.x += 1;
@@ -99,11 +100,21 @@ void Pet::_speakCheck() {
 void Pet::_walkCheck() {
     uint16_t randomChance = random(1, 3001);
     if (walkRate >= randomChance) {
+        _satiationReduction(HUNGER_WALK);
         walkSetpoint = GetRandomPosition();
     }
 }
 
+void Pet::_satiationCheck() {
+    uint64_t currentTime = millis();
+    if (currentTime - hungerLast >= HUNGER_RATE) {
+        _satiationReduction(HUNGER_DECAY);
+        hungerLast = currentTime;
+    }
+}
+
 void Pet::speak() {
+    _satiationReduction(HUNGER_SPEAK);
     isSpeaking = true;
     speakLast = millis();
     VoiceMessage message;
@@ -155,6 +166,20 @@ void Pet::setHighlight(bool highlighted) {
 
 uint16_t Pet::getHappiness() {
     return happiness;
+}
+
+uint16_t Pet::getSatiation() {
+    return satiation;
+}
+
+void Pet::_satiationReduction(uint16_t value) {
+    satiation -= value;
+    if (satiation <= 0) satiation = 1;
+}
+
+void Pet::feed(uint8_t value) {
+    satiation += value;
+    if (satiation >= MAX_SATIATION) satiation = MAX_SATIATION - 1;
 }
 
 void Pet::toggleHighlight() {

@@ -19,11 +19,12 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUZZER 4
 #define VIBRATION_SENSOR 5
 
-#define INPUT_DEBOUNCE 400
+#define INPUT_DEBOUNCE 100
 
-#define PET_COUNT 10
+#define PET_COUNT 2
 
 Pet *pets[PET_COUNT];
+Bar hungerBar (&display, 1, 1, 62, 12, MAX_SATIATION, MAX_SATIATION);
 
 QueueHandle_t voiceQueue;
 
@@ -47,17 +48,25 @@ void MainLoop(void *) {
     uint8_t currentPet = 0;
 
     while (1) {
+        hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
+
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             lastDebounce = millis();
-            pets[currentPet]->setHighlight(false);
+            
+            if (currentPet < PET_COUNT)
+                pets[currentPet]->setHighlight(false);
             currentPet++;
-            if (currentPet >= PET_COUNT) currentPet = 0;
-            pets[currentPet]->setHighlight(true);
+
+            if (currentPet > PET_COUNT) currentPet = 0;
+
+            if (currentPet < PET_COUNT)
+                pets[currentPet]->setHighlight(true);
         }
     
-        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
+        if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
             pets[currentPet]->speak();
+            pets[currentPet]->feed(30);
         }
         
         display.clearDisplay();
@@ -94,9 +103,6 @@ void setup()
     for (int i = 0; i < PET_COUNT; i++) {
         pets[i] = new Pet(&display, voiceQueue);
     }
-
-    new Bar(&display, 1, 1, 62, 12, 30, 100);
-    new Bar(&display, 63, 1, 62, 12, 79, 100);
 
     xTaskCreate(MainLoop, "Main Loop", 8192, NULL, 2, NULL);
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);

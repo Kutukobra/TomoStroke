@@ -21,10 +21,16 @@ typedef struct Vector2D {
 #define SPEAK_INTERVAL_OFFSET 3000
 
 #define VOICE_LENGTH_MAX 6
-#define TONE_MIN 900
+#define TONE_MIN 300
 #define TONE_MAX 3000
 #define TONE_DURATION_DEFAULT 100
 #define TONE_DURATION_OFFSET 40
+
+#define MAX_SATIATION 1000
+#define HUNGER_RATE 1000
+#define HUNGER_DECAY 1
+#define HUNGER_SPEAK 8
+#define HUNGER_WALK 3
 
 #define MAX_HAPPINESS 1000
 
@@ -58,6 +64,10 @@ class Pet {
     void _walkCheck();
 
     uint16_t happiness = MAX_HAPPINESS;
+    uint16_t satiation = 0;
+    uint64_t hungerLast = 0;
+    void _satiationReduction(uint16_t value);
+    void _satiationCheck();
     
     bool isHighlighted = false;
     
@@ -78,6 +88,8 @@ class Pet {
         void speak();
 
         uint16_t getHappiness();
+        uint16_t getSatiation();
+        void feed(uint8_t value);
 
         void setHighlight(bool isHighlighted);
         void toggleHighlight();

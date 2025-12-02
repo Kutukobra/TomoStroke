@@ -1,6 +1,6 @@
 #include <Bar.hpp>
 
-Bar::Bar(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY, uint8_t width, uint8_t height, uint8_t currentCapacity, uint8_t maxCapacity)
+Bar::Bar(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY, uint8_t width, uint8_t height, uint16_t currentCapacity, uint16_t maxCapacity)
 : GUI(displayDriver, posX, posY), width(width), height(height),  currentCapacity(currentCapacity), maxCapacity(maxCapacity) {
     Serial.printf("New Bar\n\t- Position: %d %d\n\t- Dimensions: %d %d\n\t- Capacities %d/%d\n", 
         this->posX, this->posY, this->width, this->height, this->currentCapacity, this->maxCapacity
