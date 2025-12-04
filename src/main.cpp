@@ -58,7 +58,19 @@ void MainLoop(void *) {
         happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
 
         if (currentPet != PET_COUNT) {
-            
+            uint8_t face = pets[currentPet]->getFace();
+
+            uint8_t faceIcon;
+            if (face == FACE_HAPPY) {
+                faceIcon = ICON_HAPPY;
+            } else if (face == FACE_SAD) {
+                faceIcon = ICON_SAD;
+            } else if (face == FACE_BLINK) {
+                faceIcon = ICON_BORED;
+            }
+            happinessIcon.setIcon(faceIcon);
+
+            hungerIcon.setIcon(pets[currentPet]->isHungry() ? ICON_HUNGRY : ICON_SATIATED);
         }
 
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
