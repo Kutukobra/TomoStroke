@@ -126,7 +126,7 @@ const unsigned char sprite_icon_bored [] PROGMEM = {
 };
 
 // Array of all bitmaps for convenience. (Total bytes used to store images in PROGMEM = 240)
-const unsigned char* sprite_allArray[5] = {
+const unsigned char* sprite_icons[5] = {
 	sprite_icon_satiated,
 	sprite_icon_hungry,
 	sprite_icon_happy,

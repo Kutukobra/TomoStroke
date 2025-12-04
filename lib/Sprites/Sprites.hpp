@@ -56,16 +56,19 @@ extern const uint8_t sprite_head_8[] PROGMEM;
 extern const uint8_t* const sprite_heads[HEAD_COUNT];
 
 // Icon
-extern const unsigned char sprite_icon_satiated [] PROGMEM;
-extern const unsigned char sprite_icon_hungry [] PROGMEM;
-extern const unsigned char sprite_icon_happy [] PROGMEM;
-extern const unsigned char sprite_icon_bored [] PROGMEM;
-extern const unsigned char sprite_icon_sad [] PROGMEM;
+extern const uint8_t sprite_icon_satiated [] PROGMEM;
+extern const uint8_t sprite_icon_hungry [] PROGMEM;
+extern const uint8_t sprite_icon_happy [] PROGMEM;
+extern const uint8_t sprite_icon_bored [] PROGMEM;
+extern const uint8_t sprite_icon_sad [] PROGMEM;
 
+#define ICON_COUNT 5
 #define ICON_SATIATED 0
 #define ICON_HUNGRY 1
 #define ICON_HAPPY 2
 #define ICON_BORED 3
 #define ICON_SAD 4
+
+extern const uint8_t* const sprite_icons[ICON_COUNT];
 
 #endif
