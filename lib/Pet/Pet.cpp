@@ -38,12 +38,13 @@ void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
 }
 
 void Pet::update() {
-    face = FACE_IDLE;
     _happinessCheck();
     _satiationCheck();
     _blinkCheck();
     _speakCheck();
     _walkCheck();
+
+    _faceCheck();
 
     if (walkSetpoint.x > position.x) {
         position.x += 1;
@@ -70,17 +71,38 @@ void Pet::update() {
     }
 }
 
+void Pet::_faceCheck() {
+    face = FACE_IDLE;
+    
+    if (isBlinking) {
+        face = FACE_BLINK;
+        return;
+    }
+
+    if (happiness <= MAX_HAPPINESS * 4 / 10) {
+        face = FACE_SAD;
+    } else if (happiness <= MAX_HAPPINESS * 6 / 10) {
+        face = FACE_BLINK;
+    } else if (satiation >= MAX_SATIATION * 95 / 100) {
+        face = FACE_HAPPY;
+    }
+    
+    if (isHungry) {
+        face = FACE_SURPRISED;
+    }
+}
+
 void Pet::_blinkCheck() {
     uint64_t currentTime = millis();
 
-    if (eyeClosed) {
+    if (isBlinking) {
         if (currentTime - blinkLast >= BLINK_CLOSED_DEFAULT + blinkInterval / 10) {
-            eyeClosed = false;
+            isBlinking = false;
             blinkLast = currentTime;
         }
     } else {
         if (currentTime - blinkLast >= blinkInterval) {
-            eyeClosed = true;
+            isBlinking = true;
             blinkLast = currentTime;
         }
     }
@@ -89,10 +111,7 @@ void Pet::_blinkCheck() {
 void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
-    bool isHungry = satiation < MAX_SATIATION / 3;
     uint64_t speakIntervalModified = (isHungry ? speakInterval / 10 : speakInterval);
-
-    if (isHungry) face = FACE_SAD;
 
     if (isSpeaking && (currentTime - speakLast >= 200 * voiceLength)) {
         isSpeaking = false;
@@ -118,8 +137,7 @@ void Pet::_satiationCheck() {
         _satiationReduction(HUNGER_DECAY);
         hungerLast = currentTime;
     }
-    if (satiation <= MAX_SATIATION / 3) face = FACE_SURPRISED;
-    else if (satiation >= MAX_SATIATION * 95 / 100) face = FACE_HAPPY;
+    isHungry = satiation <= MAX_SATIATION / 3;
 }
 
 void Pet::_happinessCheck() {
@@ -127,10 +145,7 @@ void Pet::_happinessCheck() {
     if (currentTime - lonelyLast >= HAPPINESS_RATE) {
         _happinessReduction(HAPPINESS_DECAY);
         lonelyLast = currentTime;
-    }
-    
-    if (happiness <= MAX_HAPPINESS * 2 / 10) face = FACE_SAD;
-    else if (happiness <= MAX_HAPPINESS * 6 / 10) face = FACE_BLINK;
+    }   
 }
 
 void Pet::speak(int16_t toneOffset) {
@@ -154,18 +169,12 @@ void Pet::_generateVoice() {
 }
 
 void Pet::draw() {
-
-    uint8_t drawFace = face;
-
-    if (eyeClosed) drawFace = FACE_BLINK;
-    if (isSpeaking) drawFace = FACE_SURPRISED;
-
     // Head
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y - SPRITE_HEIGHT / 2, sprite_heads[head], HEAD_WIDTH, HEAD_HEIGHT, SSD1306_INVERSE);
     // Body
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y, sprite_bodies[body], BODY_WIDTH, BODY_HEIGHT, SSD1306_INVERSE);
     // Face
-    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[drawFace], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
+    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[face], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
 
     // Highlight
     if (isHighlighted) {

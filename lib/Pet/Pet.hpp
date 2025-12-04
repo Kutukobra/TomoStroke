@@ -52,7 +52,7 @@ class Pet {
     Vector2D position, velocity = {0, 0};
 
     uint64_t blinkLast = 0, blinkInterval;
-    bool eyeClosed = false;
+    bool isBlinking = false;
     
     void _blinkCheck();
 
@@ -76,6 +76,9 @@ class Pet {
     uint64_t hungerLast = 0;
     void _satiationReduction(uint16_t value);
     void _satiationCheck();
+    bool isHungry = false;
+
+    void _faceCheck();
     
     bool isHighlighted = false;
     
