@@ -187,14 +187,6 @@ void Pet::draw() {
     }
 }
 
-void Pet::setPosition(int8_t newX, int8_t newY) {
-    position = {newX, newY};
-}
-
-Vector2D Pet::getPosition() {
-    return position;
-}
-
 void Pet::setHighlight(bool highlighted) {
     isHighlighted = highlighted;
 }
