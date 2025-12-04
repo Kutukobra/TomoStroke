@@ -46,6 +46,8 @@ void Pet::update() {
 
     _faceCheck();
 
+    velocity = {0, 0};
+
     if (walkSetpoint.x > position.x) {
         velocity.x = 1;
     } else if (walkSetpoint.x < position.x) {
@@ -92,7 +94,7 @@ void Pet::_faceCheck() {
         face = FACE_HAPPY;
     }
     
-    if (isHungry && random(0, 6)) {
+    if (hungry && random(0, 6)) {
         face = FACE_SURPRISED;
     }
 }
@@ -116,14 +118,14 @@ void Pet::_blinkCheck() {
 void Pet::_speakCheck() {
     uint64_t currentTime = millis();
 
-    uint64_t speakIntervalModified = (isHungry ? speakInterval / 10 : speakInterval);
+    uint64_t speakIntervalModified = (hungry ? speakInterval / 10 : speakInterval);
 
     if (isSpeaking && (currentTime - speakLast >= 200 * voiceLength)) {
         isSpeaking = false;
     }
 
     if (currentTime - speakLast > speakIntervalModified) {
-        speak(isHungry ? TONE_HUNGRY_OFFSET : 0);
+        speak(hungry ? TONE_HUNGRY_OFFSET : 0);
         speakLast = currentTime + random(-SPEAK_INTERVAL_OFFSET, SPEAK_INTERVAL_OFFSET);
     }
 }
@@ -142,7 +144,7 @@ void Pet::_satiationCheck() {
         _satiationReduction(HUNGER_DECAY);
         hungerLast = currentTime;
     }
-    isHungry = satiation <= MAX_SATIATION / 3;
+    hungry = satiation <= MAX_SATIATION / 3;
 }
 
 void Pet::_happinessCheck() {
@@ -197,6 +199,14 @@ int16_t Pet::getHappiness() {
 
 int16_t Pet::getSatiation() {
     return satiation;
+}
+
+uint8_t Pet::getFace() {
+    return face;
+}
+
+bool Pet::isHungry() {
+    return hungry;
 }
 
 void Pet::_satiationReduction(uint16_t value) {

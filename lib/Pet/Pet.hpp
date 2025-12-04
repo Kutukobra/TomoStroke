@@ -30,12 +30,12 @@ typedef struct Vector2D {
 
 #define MAX_SATIATION 1000
 #define HUNGER_RATE 5000
-#define HUNGER_DECAY 200
+#define HUNGER_DECAY 2
 #define HUNGER_WALK 5
 
 #define MAX_HAPPINESS 1000
 #define HAPPINESS_RATE 8000
-#define HAPPINESS_DECAY 100
+#define HAPPINESS_DECAY 1
 
 typedef struct VoiceMessage {
     uint16_t *voice;
@@ -76,7 +76,7 @@ class Pet {
     uint64_t hungerLast = 0;
     void _satiationReduction(uint16_t value);
     void _satiationCheck();
-    bool isHungry = false;
+    bool hungry = false;
 
     void _faceCheck();
     
@@ -98,6 +98,10 @@ class Pet {
         int16_t getHappiness();
         int16_t getSatiation();
         void feed(uint8_t value);
+
+        uint8_t getFace();
+
+        bool isHungry();
 
         void setHighlight(bool isHighlighted);
         void toggleHighlight();
