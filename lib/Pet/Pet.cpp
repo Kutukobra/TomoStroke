@@ -47,15 +47,20 @@ void Pet::update() {
     _faceCheck();
 
     if (walkSetpoint.x > position.x) {
-        position.x += 1;
+        velocity.x = 1;
     } else if (walkSetpoint.x < position.x) {
-        position.x -= 1;
+        velocity.x = -1;
     }
 
     if (walkSetpoint.y > position.y) {
-        position.y += 1;
+        velocity.y = 1;
     } else if (walkSetpoint.y < position.y) {
-        position.y -= 1;
+        velocity.y = -1;
+    }
+
+    if (!isSpeaking) {
+        position.x += velocity.x;
+        position.y += velocity.y;
     }
 
     if (position.y - SPRITE_HEIGHT / 2 <= 18) { // Limit top bar
@@ -87,7 +92,7 @@ void Pet::_faceCheck() {
         face = FACE_HAPPY;
     }
     
-    if (isHungry) {
+    if (isHungry && random(0, 6)) {
         face = FACE_SURPRISED;
     }
 }

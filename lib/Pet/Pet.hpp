@@ -30,12 +30,12 @@ typedef struct Vector2D {
 
 #define MAX_SATIATION 1000
 #define HUNGER_RATE 5000
-#define HUNGER_DECAY 2
+#define HUNGER_DECAY 200
 #define HUNGER_WALK 5
 
 #define MAX_HAPPINESS 1000
 #define HAPPINESS_RATE 8000
-#define HAPPINESS_DECAY 1
+#define HAPPINESS_DECAY 100
 
 typedef struct VoiceMessage {
     uint16_t *voice;
