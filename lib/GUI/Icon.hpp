@@ -13,7 +13,7 @@ class Icon : GUI {
     void draw() override;
 
     public:
-        Icon(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY, uint8_t width, uint8_t height);
+        Icon(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY);
         void setIcon(uint8_t icon);
 };
 

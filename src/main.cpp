@@ -5,6 +5,7 @@
 
 #include <Pet.hpp>
 #include <Bar.hpp>
+#include <Icon.hpp>
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
@@ -24,8 +25,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define PET_COUNT 8
 
 Pet *pets[PET_COUNT];
-Bar hungerBar(&display, 1, 1, 62, 12, MAX_SATIATION, MAX_SATIATION);
-Bar happinessBar(&display, 65, 1, 62, 12, MAX_HAPPINESS, MAX_HAPPINESS);
+Icon hungerIcon(&display, 0, 0);
+Bar hungerBar(&display, 17, 1, 46, 12, MAX_SATIATION, MAX_SATIATION);
+Icon happinessIcon(&display, 65, 0);
+Bar happinessBar(&display, 82, 1, 46, 12, MAX_HAPPINESS, MAX_HAPPINESS);
 
 uint16_t feedingSound[] = {100, 20};
 
@@ -53,6 +56,10 @@ void MainLoop(void *) {
     while (1) {
         hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
         happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
+
+        if (currentPet != PET_COUNT) {
+            
+        }
 
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             lastDebounce = millis();
