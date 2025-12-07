@@ -7,6 +7,8 @@
 #include <Bar.hpp>
 #include <Icon.hpp>
 
+#include <mesh.controller.h>
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -33,6 +35,10 @@ Bar happinessBar(&display, 82, 1, 46, 12, MAX_HAPPINESS, MAX_HAPPINESS);
 uint16_t feedingSound[] = {100, 20};
 
 QueueHandle_t voiceQueue;
+
+void BroadcastTask(void *) {
+
+}
 
 void VoiceTask(void*) {
     VoiceMessage message;

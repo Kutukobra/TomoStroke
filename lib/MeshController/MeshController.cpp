@@ -2,7 +2,7 @@
 #include <painlessMesh.h>
 #include <vector>
 #include "esp_system.h"
-#include "mesh.controller.h"
+#include "MeshController.h"
 
 #define MESH_PREFIX   "TomoMesh"
 #define MESH_PASSWORD "12345678"
@@ -97,9 +97,7 @@ void receivedCallback(uint32_t from, String &msg) {
         String data = msg.substring(13);
         data.replace(";", "");
 
-        int idx = findPeer(mac);
         PeerPet p;
-        if (idx >= 0) p = peers[idx];
 
         p.mac = mac;
 
@@ -120,10 +118,6 @@ void receivedCallback(uint32_t from, String &msg) {
 
         p.lastSeen = millis();
 
-        if (idx >= 0)
-            peers[idx] = p;
-        else
-            peers.push_back(p);
     }
 
     else if (msg.startsWith("FED ")) {
@@ -136,36 +130,9 @@ void receivedCallback(uint32_t from, String &msg) {
     }
 }
 
-void prunePeers() {
-    unsigned long now = millis();
-    for (int i = peers.size() - 1; i >= 0; i--) {
-        if (now - peers[i].lastSeen > PEER_TTL) {
-            peers.erase(peers.begin() + i);
-        }
-    }
-}
-
 void meshSetup() {
     mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT);
     mesh.onReceive(&receivedCallback);
     lastBroadcast = millis();
     lastPrune = millis();
-}
-
-void meshLoop() {
-    mesh.update();
-
-    unsigned long now = millis();
-
-    if (now - lastBroadcast >= BROADCAST_INTERVAL) {
-        taskBroadcast();
-        lastBroadcast = now;
-    }
-
-    if (now - lastPrune >= PRUNE_INTERVAL) {
-        prunePeers();
-        lastPrune = now;
-    }
-
-    processQueue();
 }
