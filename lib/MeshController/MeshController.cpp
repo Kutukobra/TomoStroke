@@ -1,39 +1,13 @@
-#include <Arduino.h>
-#include <painlessMesh.h>
-#include <vector>
-#include "esp_system.h"
-#include "MeshController.h"
+#include "MeshController.hpp"
 
-#define MESH_PREFIX   "TomoMesh"
-#define MESH_PASSWORD "12345678"
-#define MESH_PORT     5555
+MeshController::MeshController(QueueHandle_t petDataQueue, QueueHandle_t friendFeedQueue) :
+    petDataQueue(petDataQueue), friendFeedQueue(friendFeedQueue)
+{
 
-painlessMesh mesh;
+}
 
-#define BROADCAST_INTERVAL  15000
-#define PRUNE_INTERVAL  5000
-#define PEER_TTL  60000
 
-unsigned long lastBroadcast = 0;
-unsigned long lastPrune = 0;
-
-String messageQueue = "";
-
-struct PeerPet {
-    String mac;
-    uint8_t bodyId = 0;
-    uint8_t headId = 0;
-    uint32_t blink = 0;
-    uint8_t walkRate = 0;
-    uint8_t voiceLen = 0;
-    uint8_t hunger = 100;
-    uint8_t social = 100;
-    unsigned long lastSeen = 0;
-};
-
-std::vector<PeerPet> peers;
-
-String getOwnMac() {
+String MeshController::GetOwnMac() {
     uint8_t m[6];
     esp_read_mac(m, ESP_MAC_WIFI_STA);
     char buf[13];
@@ -42,53 +16,34 @@ String getOwnMac() {
     return String(buf);
 }
 
-int findPeer(const String &mac) {
-    for (int i = 0; i < peers.size(); i++) {
-        if (peers[i].mac == mac)
-            return i;
-    }
-    return -1;
-}
-
-void taskBroadcast() {
-    if (messageQueue != "") return;
-
-    String mac = getOwnMac();
-    uint8_t body = 1;
-    uint8_t head = 0;
-    uint32_t blink = 2000;
-    uint8_t walk = 20;
-    uint8_t voiceLen = 10;
-    uint8_t hunger = 80;
-    uint8_t social = 90;
+void MeshController::broadcast(uint8_t bodyId, uint8_t headId, uint8_t walkRate, uint8_t voiceLen, uint8_t hunger, uint8_t happiness, uint16_t voice[]) {
+    String mac = MeshController::GetOwnMac();
 
     String out =
         String("BRD ") +
         mac + " " +
-        body + " " +
-        head + " " +
-        blink + " " +
-        walk + " " +
+        bodyId + " " +
+        headId + " " +
+        walkRate + " " +
         voiceLen + " " +
         hunger + " " +
-        social + ";";
+        happiness + " ";
+    
+    for (uint8_t i = 0; i < voiceLen * 2; i += 2) {
+        out += voice[i] + " ";
+        out += voice[i + 1] + " ";
+    }
 
-    messageQueue = out;
+    mesh.sendBroadcast(out);
 }
 
-void taskFeedFriend(const String &targetMac) {
-    if (messageQueue != "") return;
+void MeshController::feedFriend(const String &targetMac) {
     String out = "FED " + targetMac + ";";
-    messageQueue = out;
+    mesh.sendBroadcast(out);
 }
 
-void processQueue() {
-    if (messageQueue == "") return;
-    mesh.sendBroadcast(messageQueue);
-    messageQueue = "";
-}
 
-void receivedCallback(uint32_t from, String &msg) {
+painlessmesh::receivedCallback_t MeshController::receivedCallback(uint32_t from, String &msg) {
     msg.trim();
 
     if (msg.startsWith("BRD ")) {
@@ -97,7 +52,7 @@ void receivedCallback(uint32_t from, String &msg) {
         String data = msg.substring(13);
         data.replace(";", "");
 
-        PeerPet p;
+        PetData p;
 
         p.mac = mac;
 
@@ -106,33 +61,38 @@ void receivedCallback(uint32_t from, String &msg) {
         ptr = data.indexOf(' ', ptr) + 1;
         p.headId = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
-        p.blink = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
         p.walkRate = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
         p.voiceLen = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
         p.hunger = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
-        p.social = data.substring(ptr).toInt();
+        p.happiness = data.substring(ptr).toInt();
+
+        for (uint8_t i = 0; i < p.voiceLen * 2; i += 2) {
+            ptr = data.indexOf(' ', ptr) + 1;
+            p.voice[i] = data.substring(ptr).toInt();
+            p.voice[i + 1] = data.substring(ptr).toInt();
+        }
 
         p.lastSeen = millis();
 
+        xQueueSend(petDataQueue, &p, 10);
     }
 
     else if (msg.startsWith("FED ")) {
         msg.remove(0, 4);
         msg.replace(";", "");
         String target = msg;
-        if (target == getOwnMac()) {
+        if (target == MeshController::GetOwnMac()) {
             Serial.println("RECEIVED FEED");
         }
     }
 }
 
-void meshSetup() {
+void MeshController::setup() {
     mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT);
-    mesh.onReceive(&receivedCallback);
-    lastBroadcast = millis();
-    lastPrune = millis();
+    mesh.onReceive([this](uint32_t from, String &msg) {
+        receivedCallback(from, msg);
+    });
 }

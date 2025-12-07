@@ -32,9 +32,10 @@ Bar hungerBar(&display, 17, 1, 46, 12, MAX_SATIATION, MAX_SATIATION);
 Icon happinessIcon(&display, 65, 0);
 Bar happinessBar(&display, 82, 1, 46, 12, MAX_HAPPINESS, MAX_HAPPINESS);
 
-uint16_t feedingSound[] = {100, 20};
-
 QueueHandle_t voiceQueue;
+
+QueueHandle_t inPetDataQueue;
+QueueHandle_t inFriendFeedQueue;
 
 void BroadcastTask(void *) {
 
