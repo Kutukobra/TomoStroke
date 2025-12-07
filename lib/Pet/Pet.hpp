@@ -6,9 +6,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-typedef struct Vector2D {
+struct Vector2D {
     int8_t x, y;
-} Vector2D;
+};
 
 #define GRAVITY 3
 
@@ -37,11 +37,33 @@ typedef struct Vector2D {
 #define HAPPINESS_RATE 8000
 #define HAPPINESS_DECAY 1
 
-typedef struct VoiceMessage {
+#define PET_TTL 3000
+
+struct VoiceMessage {
     uint16_t *voice;
     uint8_t voiceLength;
     int8_t toneOffset;
-} VoiceMessage;
+};
+
+struct PetLooks {
+    uint8_t headId, bodyId;
+};
+
+struct PetAttributes {
+    uint64_t speakInterval, blinkInterval;
+    uint8_t walkRate, voiceLength;
+    uint16_t voice[VOICE_LENGTH_MAX * 2];
+};
+
+struct PetData {
+    int16_t satiation, happiness;
+};
+
+typedef struct PetState {
+    PetLooks looks;
+    PetAttributes attributes;
+    PetData data;
+} PetState;
 
 class Pet {
     Adafruit_SSD1306 *displayDriver;
@@ -88,15 +110,16 @@ class Pet {
         void update();
         void draw();
 
-        void setLooks(uint8_t body, uint8_t head);
-
-        void setIntervals(uint64_t blinkInterval, uint64_t speakInterval);
+        PetLooks getLooks();
+        PetData getData();
         
+        void setLooks(uint8_t body, uint8_t head);
+        void setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength);
+        void setData(int16_t satiation, int16_t happiness);
         void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
+
         void speak(int16_t toneOffset = 0);
 
-        int16_t getHappiness();
-        int16_t getSatiation();
         void feed(uint8_t value);
 
         uint8_t getFace();

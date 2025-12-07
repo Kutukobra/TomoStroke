@@ -14,15 +14,6 @@
 
 #define VOICE_LENGTH_MAX 6
 
-typedef struct PetState {
-    uint16_t body, head, face;
-    uint64_t blinkInterval, speakInterval;
-    uint16_t voice[VOICE_LENGTH_MAX * 2];
-    uint8_t walkRate;
-    int16_t satiation;
-    int16_t happiness;
-} PetState;
-
 typedef struct PetsMap {
     String petId;
     Pet* pet;

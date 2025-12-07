@@ -25,10 +25,22 @@ void Pet::setLooks(uint8_t body, uint8_t head) {
     this->head = head;
 }
 
-
-void Pet::setIntervals(uint64_t blinkInterval, uint64_t speakInterval) {
-    this->blinkInterval = blinkInterval;
+void Pet::setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength) {
     this->speakInterval = speakInterval;
+    this->blinkInterval = blinkInterval;
+    this->walkRate = walkRate;
+    this->voiceLength = voiceLength;
+}
+
+void Pet::setData(int16_t satiation, int16_t happiness) {
+    this->satiation = satiation;
+    this->happiness = happiness;
+}
+
+PetData Pet::getData() {
+    return {
+        satiation: this->satiation, happiness: this->happiness
+    };
 }
 
 void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
@@ -191,14 +203,6 @@ void Pet::draw() {
 
 void Pet::setHighlight(bool highlighted) {
     isHighlighted = highlighted;
-}
-
-int16_t Pet::getHappiness() {
-    return happiness;
-}
-
-int16_t Pet::getSatiation() {
-    return satiation;
 }
 
 uint8_t Pet::getFace() {

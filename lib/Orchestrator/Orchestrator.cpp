@@ -71,14 +71,9 @@ void Orchestrator::clear() {
     _petCount = 0;
 }
 
-
-
-
 void Orchestrator::_loadPetState(Pet* pet, PetState state) {
-    pet->setLooks(state.body, state.head);
-    pet->setIntervals(state.blinkInterval, state.speakInterval);
-    pet->setVoice(state.voice);
-    pet->setWalkRate(state.walkRate);
-    pet->setHappiness(state.happiness);
-    pet->setSatiation(state.satiation);
+    pet->setLooks(state.looks.bodyId, state.looks.headId);
+    pet->setAttributes(state.attributes.speakInterval, state.attributes.blinkInterval, state.attributes.walkRate, state.attributes.voiceLength);
+    pet->setVoice(state.attributes.voice);
+    pet->setData(state.data.satiation, state.data.happiness);
 }

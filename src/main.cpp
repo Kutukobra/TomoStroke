@@ -7,7 +7,7 @@
 #include <Bar.hpp>
 #include <Icon.hpp>
 
-#include <mesh.controller.h>
+#include <MeshController.hpp>
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
@@ -61,8 +61,11 @@ void MainLoop(void *) {
     uint8_t currentPet = PET_COUNT;
 
     while (1) {
-        hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
-        happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
+
+        PetData currentData;
+        currentData = pets[currentPet >= PET_COUNT ? 0 : currentPet]->getData(); // Satu siklus ga ada yang dihighlight samsek
+        hungerBar.setCapacity(currentData.satiation); 
+        happinessBar.setCapacity(currentData.happiness); 
 
         if (currentPet != PET_COUNT) {
             uint8_t face = pets[currentPet]->getFace();

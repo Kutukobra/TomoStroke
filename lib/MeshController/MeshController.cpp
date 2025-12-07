@@ -1,7 +1,7 @@
 #include "MeshController.hpp"
 
 MeshController::MeshController(QueueHandle_t petDataQueue, QueueHandle_t friendFeedQueue) :
-    petDataQueue(petDataQueue), friendFeedQueue(friendFeedQueue)
+    petPacketQueue(petDataQueue), friendFeedQueue(friendFeedQueue)
 {
 
 }
@@ -16,25 +16,29 @@ String MeshController::GetOwnMac() {
     return String(buf);
 }
 
-void MeshController::broadcast(uint8_t bodyId, uint8_t headId, uint8_t walkRate, uint8_t voiceLen, uint8_t hunger, uint8_t happiness, uint16_t voice[]) {
+void MeshController::broadcast(PetState pet) {
     String mac = MeshController::GetOwnMac();
 
     String out =
         String("BRD ") +
         mac + " " +
-        bodyId + " " +
-        headId + " " +
-        walkRate + " " +
-        voiceLen + " " +
-        hunger + " " +
-        happiness + " ";
+        pet.looks.bodyId + " " +
+        pet.looks.headId + " " +
+
+        pet.attributes.blinkInterval + " " +
+        pet.attributes.speakInterval + " " +
+        pet.attributes.walkRate + " " +
+        pet.attributes.voiceLength + " " +
+
+        pet.data.satiation + " " + 
+        pet.data.happiness + " ";
     
-    for (uint8_t i = 0; i < voiceLen * 2; i += 2) {
-        out += voice[i] + " ";
-        out += voice[i + 1] + " ";
+    for (uint8_t i = 0; i < pet.attributes.voiceLength * 2; i += 2) {
+        out += pet.attributes.voice[i] + " ";
+        out += pet.attributes.voice[i + 1] + " ";
     }
 
-    mesh.sendBroadcast(out);
+    mesh.sendBroadcast(out + ";");
 }
 
 void MeshController::feedFriend(const String &targetMac) {
@@ -43,8 +47,9 @@ void MeshController::feedFriend(const String &targetMac) {
 }
 
 
-painlessmesh::receivedCallback_t MeshController::receivedCallback(uint32_t from, String &msg) {
+void MeshController::receivedCallback(uint32_t from, String &msg) {
     msg.trim();
+    Serial.println(msg);
 
     if (msg.startsWith("BRD ")) {
         msg.remove(0, 4);
@@ -52,32 +57,37 @@ painlessmesh::receivedCallback_t MeshController::receivedCallback(uint32_t from,
         String data = msg.substring(13);
         data.replace(";", "");
 
-        PetData p;
+        PetPacket p;
 
         p.mac = mac;
+        p.ttl = PET_TTL;
 
         int ptr = 0;
-        p.bodyId = data.substring(ptr).toInt();
+        p.state.looks.bodyId = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
-        p.headId = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
-        p.walkRate = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
-        p.voiceLen = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
-        p.hunger = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
-        p.happiness = data.substring(ptr).toInt();
+        p.state.looks.headId = data.substring(ptr).toInt();
 
-        for (uint8_t i = 0; i < p.voiceLen * 2; i += 2) {
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.attributes.blinkInterval = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.attributes.speakInterval = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.attributes.walkRate = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.attributes.voiceLength = data.substring(ptr).toInt();
+
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.data.satiation = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.data.happiness = data.substring(ptr).toInt();
+
+        for (uint8_t i = 0; i < p.state.attributes.voiceLength * 2; i += 2) {
             ptr = data.indexOf(' ', ptr) + 1;
-            p.voice[i] = data.substring(ptr).toInt();
-            p.voice[i + 1] = data.substring(ptr).toInt();
+            p.state.attributes.voice[i] = data.substring(ptr).toInt();
+            p.state.attributes.voice[i + 1] = data.substring(ptr).toInt();
         }
 
-        p.lastSeen = millis();
-
-        xQueueSend(petDataQueue, &p, 10);
+        xQueueSend(petPacketQueue, &p, 10);
     }
 
     else if (msg.startsWith("FED ")) {
