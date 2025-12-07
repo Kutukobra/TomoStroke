@@ -10,9 +10,9 @@
 
 painlessMesh mesh;
 
-const unsigned long BROADCAST_INTERVAL = 15000;
-const unsigned long PRUNE_INTERVAL = 5000;
-const unsigned long PEER_TTL = 60000;
+#define BROADCAST_INTERVAL  15000
+#define PRUNE_INTERVAL  5000
+#define PEER_TTL  60000
 
 unsigned long lastBroadcast = 0;
 unsigned long lastPrune = 0;
