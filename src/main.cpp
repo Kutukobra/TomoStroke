@@ -16,9 +16,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define SPRITE_HEIGHT 16
 #define SPRITE_WIDTH 16
 
-#define BUTTON_A 16
+#define BUTTON_A 5
 #define BUZZER 4
-#define VIBRATION_SENSOR 5
+#define VIBRATION_SENSOR 17
 
 #define INPUT_DEBOUNCE 100
 
@@ -74,6 +74,7 @@ void MainLoop(void *) {
         }
 
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
+            Serial.println("Button Pressed!");
             lastDebounce = millis();
             
             if (currentPet < PET_COUNT)
@@ -87,6 +88,7 @@ void MainLoop(void *) {
         }
     
         if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
+            Serial.println("Device Shaken!");
             lastVibration = millis();
             pets[currentPet]->feed(50);
         }
@@ -120,6 +122,8 @@ void setup()
         for (;;)
             ;
     }    
+
+    happinessIcon.setIcon(FACE_HAPPY);
     
     voiceQueue = xQueueCreate(3, sizeof(VoiceMessage));
 
