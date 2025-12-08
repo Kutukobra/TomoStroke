@@ -17,7 +17,7 @@ struct Vector2D {
 #define BLINK_CLOSED_DEFAULT 100
 
 #define SPEAK_MIN 30000
-#define SPEAK_MAX 360000
+#define SPEAK_MAX 60000
 #define SPEAK_INTERVAL_OFFSET 3000
 
 #define VOICE_LENGTH_MAX 6
@@ -30,7 +30,7 @@ struct Vector2D {
 
 #define MAX_SATIATION 1000
 #define HUNGER_RATE 5000
-#define HUNGER_DECAY 2
+#define HUNGER_DECAY 20
 #define HUNGER_WALK 5
 
 #define FEEDING_VALUE 50

@@ -99,31 +99,28 @@ void MainLoop(void *) {
     while (1) {
         display.clearDisplay();
         petCount = orchestrator.getPetCount() + 1;
-
+        
+        if (currentPet == 0) {
+            selectedPet = localPet;
+        } else {
+            selectedPetMap = orchestrator.getPetMap(currentPet);
+            selectedPet = selectedPetMap.pet;
+        }
+        
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             lastDebounce = millis();
 
-            selectedPet->setHighlight(false);
             currentPet++;
-            if (currentPet >= petCount) {
-                currentPet = -1;
-                selectedPet = localPet;
-            } else {
-                if (currentPet == 0) {
-                    selectedPet = localPet;
-                } else {
-                    selectedPetMap = orchestrator.getPetMap(currentPet);
-                    selectedPet = selectedPetMap.pet;
-                }
+            if (currentPet > petCount) {
+                currentPet = 0;
             }
-            selectedPet->setHighlight(true);
         }
         
         if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
             selectedPet->feed(FEEDING_VALUE);
             if (selectedPet != localPet) {
-                meshController.feedFriend(selectedPetMap.petId);
+                // meshController.feedFriend(selectedPetMap.petId);
             }
         }
                    

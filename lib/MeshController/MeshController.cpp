@@ -41,7 +41,7 @@ void MeshController::broadcast(PetState pet) {
         voice += String(pet.attributes.voice[i]) + " " + String(pet.attributes.voice[i + 1]) + String(" ");
     }
 
-    Serial.println("Sending: " + out + voice + ";");
+    // Serial.println("Sending: " + out + voice + ";");
     mesh.sendBroadcast(out + voice + ";");
 }
 
@@ -52,7 +52,7 @@ void MeshController::feedFriend(const String &targetMac) {
 
 
 void MeshController::receivedCallback(uint32_t from, String &msg) {
-    Serial.println("Received: " + msg);
+    // Serial.println("Received: " + msg);
     msg.trim();
 
     if (msg.startsWith("BRD ")) {
@@ -70,9 +70,9 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         p.state.looks.bodyId = data.substring(ptr).toInt();
 
         ptr = data.indexOf(' ', ptr) + 1;
-        p.state.attributes.blinkInterval = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
         p.state.attributes.speakInterval = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.attributes.blinkInterval = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
         p.state.attributes.walkRate = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;

@@ -16,12 +16,6 @@ void Orchestrator::update() {
             _petsMap[i].pet->update();
             _petsMap[i].pet->draw();
         }
-        // Pet *p = _petsMap[i].pet;
-        // Serial.printf("Pet %s\n\t-Looks: %d %d\n\t-Data: %d %d\n", 
-        //     _petsMap[i].petId, 
-        //     p->getLooks().headId, p->getLooks().bodyId,
-        //     p->getData().satiation, p->getData().happiness
-        // );
     }
 }
 
@@ -41,7 +35,10 @@ void Orchestrator::_addPet(String petId, PetState initial) {
 
     _petsMap[_petCount].petId = petId;
     _petsMap[_petCount].ttl = millis();
-    _loadPetState(_petsMap[_petCount].pet, initial);
+    Pet *pet = _petsMap[_petCount].pet;
+
+    pet->setLooks(initial.looks.headId, initial.looks.bodyId);
+    pet->setAttributes(initial.attributes.speakInterval, initial.attributes.blinkInterval, initial.attributes.walkRate, initial.attributes.voiceLength, initial.attributes.voice);
 
     _petCount++;
     return;
