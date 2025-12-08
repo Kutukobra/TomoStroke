@@ -7,6 +7,9 @@
 #include <Bar.hpp>
 #include <Icon.hpp>
 
+#include <MeshController.hpp>
+#include <Orchestrator.hpp>
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -22,17 +25,53 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define INPUT_DEBOUNCE 100
 
-#define PET_COUNT 8
 
-Pet *pets[PET_COUNT];
+Pet *localPet;
+
 Icon hungerIcon(&display, 0, 0);
 Bar hungerBar(&display, 17, 1, 46, 12, MAX_SATIATION, MAX_SATIATION);
 Icon happinessIcon(&display, 65, 0);
 Bar happinessBar(&display, 82, 1, 46, 12, MAX_HAPPINESS, MAX_HAPPINESS);
 
-uint16_t feedingSound[] = {100, 20};
-
 QueueHandle_t voiceQueue;
+
+QueueHandle_t inPetPacketQueue;
+QueueHandle_t inFriendFeedQueue;
+
+MeshController meshController(&inPetPacketQueue, &inFriendFeedQueue);
+
+Orchestrator orchestrator(&display, &voiceQueue);
+
+void FriendFeedTask(void*) {
+    uint8_t feedingValue;
+    while (1) {
+        if (xQueueReceive(inFriendFeedQueue, &feedingValue, portMAX_DELAY) == pdTRUE) {
+            Serial.println("Fed: " + feedingValue);
+            localPet->feed(feedingValue);
+        } 
+    }
+}
+
+void PetPacketTask(void*) {
+    PetPacket petPacket;
+    while (1) {
+        if (xQueueReceive(inPetPacketQueue, &petPacket, portMAX_DELAY) == pdTRUE) {
+            orchestrator.updatePet(petPacket.mac, petPacket.state);
+        }
+    }
+}
+
+void BroadcastTask(void *) {
+    while (1) {
+        PetState petState;
+        petState.looks = localPet->getLooks();
+        petState.attributes = localPet->getAttributes();
+        petState.data = localPet->getData();
+        meshController.broadcast(petState);
+
+        vTaskDelay(PET_TTL / 2);
+    }
+}
 
 void VoiceTask(void*) {
     VoiceMessage message;
@@ -51,9 +90,14 @@ void VoiceTask(void*) {
 void MainLoop(void *) {
     uint64_t lastDebounce;
     uint64_t lastVibration;
-    uint8_t currentPet = PET_COUNT;
+
+    Pet *selectedPet = localPet;
+    PetMap selectedPetMap;
+    uint8_t petCount; 
+    uint8_t currentPet = 0;
 
     while (1) {
+<<<<<<< HEAD
         hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
         happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
 
@@ -71,37 +115,66 @@ void MainLoop(void *) {
             happinessIcon.setIcon(faceIcon);
 
             hungerIcon.setIcon(pets[currentPet]->isHungry() ? ICON_HUNGRY : ICON_SATIATED);
+=======
+        display.clearDisplay();
+        petCount = orchestrator.getPetCount() + 1;
+        if (currentPet >= petCount) {
+            currentPet = 0;
+>>>>>>> finalization
         }
-
+        
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             Serial.println("Button Pressed!");
             lastDebounce = millis();
             
-            if (currentPet < PET_COUNT)
-                pets[currentPet]->setHighlight(false);
             currentPet++;
-
-            if (currentPet > PET_COUNT) currentPet = 0;
-
-            if (currentPet < PET_COUNT)
-                pets[currentPet]->setHighlight(true);
+            if (currentPet >= petCount) {
+                currentPet = 0;
+            }
         }
+<<<<<<< HEAD
     
         if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             Serial.println("Device Shaken!");
+=======
+
+        // Pet Selection
+        if (currentPet == 0) {
+            selectedPet = localPet;
+        } else {
+            selectedPetMap = orchestrator.getPetMap(currentPet);
+            selectedPet = selectedPetMap.pet;
+        }
+
+        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
+>>>>>>> finalization
             lastVibration = millis();
-            pets[currentPet]->feed(50);
+            selectedPet->feed(FEEDING_VALUE);
+            if (selectedPet != localPet) {
+                meshController.feedFriend(selectedPetMap.petId);
+            }
         }
         
-        display.clearDisplay();
-        for (int i = 0; i < PET_COUNT; i++) {
-            pets[i]->update();
-            pets[i]->draw();
+        { // GUI Update
+            PetData currentData;
+            currentData = selectedPet->getData(); // Satu siklus ga ada yang dihighlight samsek
+            hungerBar.setCapacity(currentData.satiation); 
+            happinessBar.setCapacity(currentData.happiness); 
+
+            uint8_t face = selectedPet->getFace();
+            happinessIcon.setIcon(Icon::FaceToIcon(face));
+
+            hungerIcon.setIcon(selectedPet->isHungry() ? ICON_HUNGRY : ICON_SATIATED);
+
+            GUI::DrawAll();
         }
 
-        if (currentPet != PET_COUNT)
-            GUI::DrawAll();
+        localPet->update();
+        orchestrator.update();
+        
+        localPet->draw();
 
+        selectedPet->drawHighlight();
         display.display();
         vTaskDelay(pdMS_TO_TICKS(40));
     }
@@ -126,16 +199,21 @@ void setup()
     happinessIcon.setIcon(FACE_HAPPY);
     
     voiceQueue = xQueueCreate(3, sizeof(VoiceMessage));
+    inPetPacketQueue = xQueueCreate(5, sizeof(PetPacket));
+    inFriendFeedQueue = xQueueCreate(5, sizeof(uint8_t));
 
-    for (int i = 0; i < PET_COUNT; i++) {
-        pets[i] = new Pet(&display, voiceQueue);
-    }
+    localPet = new Pet(&display, &voiceQueue);
+
+    meshController.setup();
 
     xTaskCreate(MainLoop, "Main Loop", 8192, NULL, 2, NULL);
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
+    xTaskCreate(BroadcastTask, "Broadcast Task", 8192, NULL, 2, NULL);
+    xTaskCreate(PetPacketTask, "Packet Handling Task", 8192, NULL, 1, NULL);
+    xTaskCreate(FriendFeedTask, "Fed by Friend Task", 8192, NULL, 1, NULL);
 }
 
 void loop()
 {
-    // Jangan taro apapun di sini
+    meshController.update();
 }

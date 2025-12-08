@@ -6,9 +6,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-typedef struct Vector2D {
+struct Vector2D {
     int8_t x, y;
-} Vector2D;
+};
 
 #define GRAVITY 3
 
@@ -17,7 +17,7 @@ typedef struct Vector2D {
 #define BLINK_CLOSED_DEFAULT 100
 
 #define SPEAK_MIN 30000
-#define SPEAK_MAX 360000
+#define SPEAK_MAX 60000
 #define SPEAK_INTERVAL_OFFSET 3000
 
 #define VOICE_LENGTH_MAX 6
@@ -26,28 +26,52 @@ typedef struct Vector2D {
 #define TONE_DURATION_DEFAULT 100
 #define TONE_DURATION_OFFSET 40
 #define TONE_HUNGRY_OFFSET 500
-#define TONE_LONELY_OFFSET -900
+#define TONE_LONELY_OFFSET -500
 
 #define MAX_SATIATION 1000
 #define HUNGER_RATE 5000
-#define HUNGER_DECAY 2
+#define HUNGER_DECAY 20
 #define HUNGER_WALK 5
+
+#define FEEDING_VALUE 50
 
 #define MAX_HAPPINESS 1000
 #define HAPPINESS_RATE 8000
-#define HAPPINESS_DECAY 1
+#define HAPPINESS_DECAY 10
 
-typedef struct VoiceMessage {
+#define PET_TTL 3000
+
+struct VoiceMessage {
     uint16_t *voice;
     uint8_t voiceLength;
     int8_t toneOffset;
-} VoiceMessage;
+};
+
+struct PetLooks {
+    uint8_t headId, bodyId;
+};
+
+struct PetAttributes {
+    uint64_t speakInterval, blinkInterval;
+    uint8_t walkRate, voiceLength;
+    uint16_t voice[VOICE_LENGTH_MAX * 2];
+};
+
+struct PetData {
+    int16_t satiation, happiness;
+};
+
+typedef struct PetState {
+    PetLooks looks;
+    PetAttributes attributes;
+    PetData data;
+} PetState;
 
 class Pet {
     Adafruit_SSD1306 *displayDriver;
-    QueueHandle_t voiceQueue;
+    QueueHandle_t *voiceQueue;
 
-    uint8_t body, head, face = FACE_IDLE; // Look index
+    uint8_t bodyId, headId, face = FACE_IDLE; // Look index
 
     Vector2D position, velocity = {0, 0};
 
@@ -83,28 +107,27 @@ class Pet {
     bool isHighlighted = false;
     
     public:
-        Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceQueue);
+        Pet(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
         
         void update();
         void draw();
+        void drawHighlight();
 
-        void setLooks(uint8_t body, uint8_t head);
-
-        void setIntervals(uint64_t blinkInterval, uint64_t speakInterval);
+        PetLooks getLooks();
+        PetData getData();
+        PetAttributes getAttributes();
         
-        void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
+        void setLooks(uint8_t headId, uint8_t bodyId);
+        void setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength, uint16_t voice[]);
+        void setData(int16_t satiation, int16_t happiness);
+
         void speak(int16_t toneOffset = 0);
 
-        int16_t getHappiness();
-        int16_t getSatiation();
         void feed(uint8_t value);
 
         uint8_t getFace();
 
         bool isHungry();
-
-        void setHighlight(bool isHighlighted);
-        void toggleHighlight();
 
     static Vector2D GetRandomPosition();
 };

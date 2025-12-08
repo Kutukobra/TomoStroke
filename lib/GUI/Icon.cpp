@@ -12,3 +12,14 @@ void Icon::draw() {
 void Icon::setIcon(uint8_t icon){
     icon_bitmap = sprite_icons[icon];
 }
+
+uint8_t Icon::FaceToIcon(uint8_t face) {
+    switch(face) {
+        case FACE_HAPPY:
+            return ICON_HAPPY;
+        case FACE_SAD:
+            return ICON_SAD;
+        case FACE_BLINK:
+            return ICON_BORED;
+    }
+}

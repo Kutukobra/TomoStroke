@@ -15,6 +15,8 @@ class Icon : GUI {
     public:
         Icon(Adafruit_SSD1306 *displayDriver, uint8_t posX, uint8_t posY);
         void setIcon(uint8_t icon);
+
+    static uint8_t FaceToIcon(uint8_t face);
 };
 
 #endif
