@@ -19,16 +19,17 @@ struct PetPacket {
 
 class MeshController {
     painlessMesh mesh;
-    QueueHandle_t petPacketQueue; // Output
-    QueueHandle_t friendFeedQueue; // Output 
+    QueueHandle_t *petPacketQueue; // Output
+    QueueHandle_t *friendFeedQueue; // Output 
 
     public:
-        MeshController(QueueHandle_t petDataQueue, QueueHandle_t friendFeedQueue);
+        MeshController(QueueHandle_t *petDataQueue, QueueHandle_t *friendFeedQueue);
         void setup();
         void broadcast(PetState pet);
         void feedFriend(const String& targetMac);
         void receivedCallback(uint32_t from, String &msg);
-        
+        void update();
+
     static String GetOwnMac();
 };
 

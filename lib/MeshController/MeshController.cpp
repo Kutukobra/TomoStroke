@@ -1,6 +1,6 @@
 #include "MeshController.hpp"
 
-MeshController::MeshController(QueueHandle_t petDataQueue, QueueHandle_t friendFeedQueue) :
+MeshController::MeshController(QueueHandle_t *petDataQueue, QueueHandle_t *friendFeedQueue) :
     petPacketQueue(petDataQueue), friendFeedQueue(friendFeedQueue)
 {
 
@@ -9,7 +9,10 @@ MeshController::MeshController(QueueHandle_t petDataQueue, QueueHandle_t friendF
 
 String MeshController::GetOwnMac() {
     uint8_t m[6];
-    esp_read_mac(m, ESP_MAC_WIFI_STA);
+    if(esp_read_mac(m, ESP_MAC_WIFI_STA) != ESP_OK) {
+        return "";
+    }
+
     char buf[13];
     sprintf(buf, "%02X%02X%02X%02X%02X%02X",
             m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -22,23 +25,23 @@ void MeshController::broadcast(PetState pet) {
     String out =
         String("BRD ") +
         mac + " " +
-        pet.looks.bodyId + " " +
         pet.looks.headId + " " +
+        pet.looks.bodyId + " " +
 
-        pet.attributes.blinkInterval + " " +
         pet.attributes.speakInterval + " " +
+        pet.attributes.blinkInterval + " " +
         pet.attributes.walkRate + " " +
         pet.attributes.voiceLength + " " +
 
         pet.data.satiation + " " + 
         pet.data.happiness + " ";
     
+    String voice = "";
     for (uint8_t i = 0; i < pet.attributes.voiceLength * 2; i += 2) {
-        out += pet.attributes.voice[i] + " ";
-        out += pet.attributes.voice[i + 1] + " ";
+        voice += String(pet.attributes.voice[i]) + " " + String(pet.attributes.voice[i + 1]) + String(" ");
     }
 
-    mesh.sendBroadcast(out + ";");
+    mesh.sendBroadcast(out + voice);
 }
 
 void MeshController::feedFriend(const String &targetMac) {
@@ -48,8 +51,8 @@ void MeshController::feedFriend(const String &targetMac) {
 
 
 void MeshController::receivedCallback(uint32_t from, String &msg) {
+    Serial.println("Received: " + msg);
     msg.trim();
-    Serial.println(msg);
 
     if (msg.startsWith("BRD ")) {
         msg.remove(0, 4);
@@ -87,7 +90,7 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
             p.state.attributes.voice[i + 1] = data.substring(ptr).toInt();
         }
 
-        xQueueSend(petPacketQueue, &p, 10);
+        xQueueSend(*petPacketQueue, &p, 10);
     }
 
     else if (msg.startsWith("FED ")) {
@@ -105,4 +108,8 @@ void MeshController::setup() {
     mesh.onReceive([this](uint32_t from, String &msg) {
         receivedCallback(from, msg);
     });
+}
+
+void MeshController::update() {
+    mesh.update();
 }

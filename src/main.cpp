@@ -18,13 +18,13 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define SPRITE_HEIGHT 16
 #define SPRITE_WIDTH 16
 
-#define BUTTON_A 16
+#define BUTTON_A 5
 #define BUZZER 4
-#define VIBRATION_SENSOR 5
+#define VIBRATION_SENSOR 17
 
 #define INPUT_DEBOUNCE 100
 
-#define PET_COUNT 8
+#define PET_COUNT 1
 
 Pet *pets[PET_COUNT];
 Icon hungerIcon(&display, 0, 0);
@@ -37,8 +37,18 @@ QueueHandle_t voiceQueue;
 QueueHandle_t inPetDataQueue;
 QueueHandle_t inFriendFeedQueue;
 
-void BroadcastTask(void *) {
+MeshController meshController(&inPetDataQueue, &inFriendFeedQueue);
 
+void BroadcastTask(void *) {
+    while (1) {
+        PetState petState;
+        petState.looks = pets[0]->getLooks();
+        petState.attributes = pets[0]->getAttributes();
+        petState.data = pets[0]->getData();
+        meshController.broadcast(petState);
+
+        vTaskDelay(PET_TTL / 2);
+    }
 }
 
 void VoiceTask(void*) {
@@ -132,16 +142,21 @@ void setup()
     }    
     
     voiceQueue = xQueueCreate(3, sizeof(VoiceMessage));
+    inPetDataQueue = xQueueCreate(5, sizeof(PetPacket));
+    inFriendFeedQueue = xQueueCreate(5, sizeof(uint8_t));
 
     for (int i = 0; i < PET_COUNT; i++) {
         pets[i] = new Pet(&display, voiceQueue);
     }
 
+    meshController.setup();
+
     xTaskCreate(MainLoop, "Main Loop", 8192, NULL, 2, NULL);
     xTaskCreate(VoiceTask, "Voice Processing Task", 2048, NULL, 1, NULL);
+    xTaskCreate(BroadcastTask, "Broadcast Task", 8192, NULL, 1, NULL);
 }
 
 void loop()
 {
-    // Jangan taro apapun di sini
+    meshController.update();
 }

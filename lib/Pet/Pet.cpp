@@ -1,8 +1,8 @@
 #include <Pet.hpp>
 
 Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDriver(display), voiceQueue(voiceMessageQueue) {
-    body = random(0, BODY_COUNT);
-    head = random(0, HEAD_COUNT);
+    bodyId = random(0, BODY_COUNT);
+    headId = random(0, HEAD_COUNT);
     blinkInterval = random(BLINK_MIN, BLINK_MAX);
 
     speakInterval = random(SPEAK_MIN, SPEAK_MAX);
@@ -13,23 +13,50 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDr
 
     _generateVoice();
 
-    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, body, face, blinkInterval, walkRate);
+    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, bodyId, face, blinkInterval, walkRate);
     Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
     for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
         Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
     }
 }
 
+PetLooks Pet::getLooks() {
+    return {
+        headId: this->headId, bodyId: this->bodyId
+    };
+} 
+
 void Pet::setLooks(uint8_t body, uint8_t head) {
-    this->body = body;
-    this->head = head;
+    this->bodyId = body;
+    this->headId = head;
 }
 
-void Pet::setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength) {
+void Pet::setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength, uint16_t voice[]) {
     this->speakInterval = speakInterval;
     this->blinkInterval = blinkInterval;
     this->walkRate = walkRate;
     this->voiceLength = voiceLength;
+
+    for (int i = 0; i < voiceLength * 2; i+=2) {
+        this->voice[i] = voice[i];
+        this->voice[i + 1] = voice[i + 1];
+    }
+}
+
+PetAttributes Pet::getAttributes() {
+    PetAttributes attributes;
+    attributes.speakInterval = this->speakInterval;
+    attributes.blinkInterval = this->blinkInterval;
+    attributes.walkRate =  this->walkRate;
+    attributes.voiceLength = this->voiceLength;
+
+    for (int i = 0; i < voiceLength * 2; i+=2) {
+        // Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
+        attributes.voice[i] = voice[i];
+        attributes.voice[i + 1] = voice[i + 1];
+    }
+
+    return attributes;
 }
 
 void Pet::setData(int16_t satiation, int16_t happiness) {
@@ -41,12 +68,6 @@ PetData Pet::getData() {
     return {
         satiation: this->satiation, happiness: this->happiness
     };
-}
-
-void Pet::setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]) {
-    for (int i = 0; i < VOICE_LENGTH_MAX * 2; i++) {
-        this->voice[i] = voice[i];
-    }
 }
 
 void Pet::update() {
@@ -189,9 +210,9 @@ void Pet::_generateVoice() {
 
 void Pet::draw() {
     // Head
-    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y - SPRITE_HEIGHT / 2, sprite_heads[head], HEAD_WIDTH, HEAD_HEIGHT, SSD1306_INVERSE);
+    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y - SPRITE_HEIGHT / 2, sprite_heads[headId], HEAD_WIDTH, HEAD_HEIGHT, SSD1306_INVERSE);
     // Body
-    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y, sprite_bodies[body], BODY_WIDTH, BODY_HEIGHT, SSD1306_INVERSE);
+    displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y, sprite_bodies[bodyId], BODY_WIDTH, BODY_HEIGHT, SSD1306_INVERSE);
     // Face
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[face], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
 

@@ -69,7 +69,7 @@ class Pet {
     Adafruit_SSD1306 *displayDriver;
     QueueHandle_t voiceQueue;
 
-    uint8_t body, head, face = FACE_IDLE; // Look index
+    uint8_t bodyId, headId, face = FACE_IDLE; // Look index
 
     Vector2D position, velocity = {0, 0};
 
@@ -112,11 +112,11 @@ class Pet {
 
         PetLooks getLooks();
         PetData getData();
+        PetAttributes getAttributes();
         
         void setLooks(uint8_t body, uint8_t head);
-        void setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength);
+        void setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength, uint16_t voice[]);
         void setData(int16_t satiation, int16_t happiness);
-        void setVoice(uint16_t voice[VOICE_LENGTH_MAX * 2]);
 
         void speak(int16_t toneOffset = 0);
 
