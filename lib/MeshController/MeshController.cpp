@@ -46,6 +46,7 @@ void MeshController::broadcast(PetState pet) {
 }
 
 void MeshController::feedFriend(const String &targetMac) {
+    Serial.println("Feeding: " + targetMac);
     String out = "FED " + targetMac + ";";
     mesh.sendBroadcast(out);
 }

@@ -38,7 +38,6 @@ private:
     
     void _addPet(String petId, PetState initial);
     bool _removePet(String petId);
-    void _loadPetState(Pet* pet, PetState state);
 
 };
 

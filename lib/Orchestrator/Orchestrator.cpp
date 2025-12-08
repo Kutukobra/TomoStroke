@@ -60,13 +60,6 @@ bool Orchestrator::_removePet(String petId) {
 
     return false;
 }
-
-void Orchestrator::_loadPetState(Pet* pet, PetState state) {
-    pet->setLooks(state.looks.headId, state.looks.bodyId);
-    pet->setAttributes(state.attributes.speakInterval, state.attributes.blinkInterval, state.attributes.walkRate, state.attributes.voiceLength, state.attributes.voice);
-    pet->setData(state.data.satiation, state.data.happiness);
-}
-
 uint8_t Orchestrator::getPetCount() {
     return _petCount;
 }

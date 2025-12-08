@@ -99,31 +99,35 @@ void MainLoop(void *) {
     while (1) {
         display.clearDisplay();
         petCount = orchestrator.getPetCount() + 1;
+        if (currentPet >= petCount) {
+            currentPet = 0;
+        }
         
+        if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
+            lastDebounce = millis();
+            
+            currentPet++;
+            if (currentPet >= petCount) {
+                currentPet = 0;
+            }
+            // Serial.printf("Selecting: %d\n", currentPet);
+        }
+
         if (currentPet == 0) {
             selectedPet = localPet;
         } else {
             selectedPetMap = orchestrator.getPetMap(currentPet);
             selectedPet = selectedPetMap.pet;
         }
-        
-        if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
-            lastDebounce = millis();
 
-            currentPet++;
-            if (currentPet > petCount) {
-                currentPet = 0;
-            }
-        }
-        
         if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
             selectedPet->feed(FEEDING_VALUE);
             if (selectedPet != localPet) {
-                // meshController.feedFriend(selectedPetMap.petId);
+                meshController.feedFriend(selectedPetMap.petId);
             }
         }
-                   
+        
         { // GUI Update
             PetData currentData;
             currentData = selectedPet->getData(); // Satu siklus ga ada yang dihighlight samsek
@@ -142,6 +146,8 @@ void MainLoop(void *) {
         orchestrator.update();
         
         localPet->draw();
+
+        selectedPet->drawHighlight();
         display.display();
         vTaskDelay(pdMS_TO_TICKS(40));
     }

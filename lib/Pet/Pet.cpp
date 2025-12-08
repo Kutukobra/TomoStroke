@@ -216,15 +216,10 @@ void Pet::draw() {
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 2, position.y, sprite_bodies[bodyId], BODY_WIDTH, BODY_HEIGHT, SSD1306_INVERSE);
     // Face
     displayDriver->drawBitmap(position.x - SPRITE_WIDTH / 4, position.y - SPRITE_HEIGHT / 4, sprite_faces[face], FACE_WIDTH, FACE_HEIGHT, SSD1306_INVERSE);
-
-    // Highlight
-    if (isHighlighted) {
-        displayDriver->drawRect(position.x - SPRITE_WIDTH / 2 - 2, position.y - SPRITE_HEIGHT / 2 - 2, 20, 20, SSD1306_INVERSE);
-    }
 }
 
-void Pet::setHighlight(bool highlighted) {
-    isHighlighted = highlighted;
+void Pet::drawHighlight() {
+    displayDriver->drawRect(position.x - SPRITE_WIDTH / 2 - 2, position.y - SPRITE_HEIGHT / 2 - 2, 20, 20, SSD1306_INVERSE);
 }
 
 uint8_t Pet::getFace() {
@@ -255,10 +250,6 @@ void Pet::feed(uint8_t value) {
     
     satiation += value;
     if (satiation >= MAX_SATIATION) satiation = MAX_SATIATION;
-}
-
-void Pet::toggleHighlight() {
-    isHighlighted = !isHighlighted;
 }
 
 Vector2D Pet::GetRandomPosition() {

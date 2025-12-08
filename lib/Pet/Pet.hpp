@@ -111,6 +111,7 @@ class Pet {
         
         void update();
         void draw();
+        void drawHighlight();
 
         PetLooks getLooks();
         PetData getData();
@@ -127,9 +128,6 @@ class Pet {
         uint8_t getFace();
 
         bool isHungry();
-
-        void setHighlight(bool isHighlighted);
-        void toggleHighlight();
 
     static Vector2D GetRandomPosition();
 };
