@@ -12,8 +12,6 @@
 
 struct PetPacket {
     String mac;
-    uint64_t ttl = 500;
-
     PetState state;
 };
 

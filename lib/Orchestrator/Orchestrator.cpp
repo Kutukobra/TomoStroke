@@ -3,63 +3,59 @@
 Orchestrator::Orchestrator(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue)
     : _display(display), _voiceQueue(voiceQueue) {
     _petCount = 0;
+    for (uint8_t i = 0; i < FRIEND_PET_MAX; i++) {
+        _petsMap[i].pet = new Pet(display, voiceQueue);
+    }
 }
 
 void Orchestrator::update() {
     for (uint8_t i = 0; i < _petCount; i++) {
         if (_petsMap[i].petId != "") {
-            if (millis() - _petsMap[i].ttl < PET_TTL) {
+            if (millis() - _petsMap[i].ttl >= PET_TTL) {
+                _removePet(_petsMap[i].petId);
+            } else {
                 _petsMap->pet->update();
                 _petsMap->pet->draw();
-            } else {
-                removePet(_petsMap[i].petId);
             }
         }
     }
 }
 
-Pet* Orchestrator::updatePet(String petId, uint16_t ttl, PetState state) {
-    for (uint8_t i = 0; i < _petCount; i++) {
+void Orchestrator::updatePet(String petId, PetState state) {
+    for (uint8_t i = 0; i < FRIEND_PET_MAX; i++) {
         if (_petsMap[i].petId == petId) {
-            _petsMap[i].ttl = ttl;
+            _petsMap[i].ttl = millis();
             _loadPetState(_petsMap[i].pet, state);
 
-            return _petsMap[i].pet;
+            return;
         }
     }
-    return addPet(petId, ttl, state);
+    _addPet(petId, state);
 }
 
-Pet* Orchestrator::addPet(String petId, uint16_t ttl, PetState initial) {
+void Orchestrator::_addPet(String petId, PetState initial) {
     Serial.println("Adding new pet!");
 
-    for (uint8_t i = 0; i < _petCount; i++) {
+    uint8_t i = 0;
+    for (; i < FRIEND_PET_MAX; i++) {
         if (_petsMap[i].petId == "") {
-            _petsMap[i].petId = petId;
-            _petsMap[i].ttl = ttl;
-            _petsMap[i].pet = new Pet(_display, *_voiceQueue);
-            if (_petsMap[i].pet == nullptr) {
-                Serial.println("Failed to create pet instance");
-                return nullptr;
-            }
-            _loadPetState(_petsMap[i].pet, initial);
-
-            return _petsMap[i].pet;
+            break;
         }
     }
+    
+    _petsMap[i].petId = petId;
+    _petsMap[i].ttl = millis();
+    _loadPetState(_petsMap[i].pet, initial);
 
-    _petsMap[_petCount].petId = petId;
-    _petsMap[_petCount].ttl = ttl;
-    _petsMap[_petCount].pet = new Pet(_display, *_voiceQueue);
     _petCount++;
-    return _petsMap[_petCount - 1].pet;
+    return;
 }
 
-bool Orchestrator::removePet(String petId) {
-    for (uint8_t i = 0; i < _petCount; i++) {
+bool Orchestrator::_removePet(String petId) {
+    Serial.println("Removing pet: " + petId);    
+    for (uint8_t i = 0; i < FRIEND_PET_MAX; i++) {
         if (_petsMap[i].petId == petId) {
             _petsMap[i].petId = "";
-            delete _petsMap[i].pet;
             _petCount--;
             return true;
         }
@@ -71,4 +67,25 @@ void Orchestrator::_loadPetState(Pet* pet, PetState state) {
     pet->setLooks(state.looks.bodyId, state.looks.headId);
     pet->setAttributes(state.attributes.speakInterval, state.attributes.blinkInterval, state.attributes.walkRate, state.attributes.voiceLength, state.attributes.voice);
     pet->setData(state.data.satiation, state.data.happiness);
+}
+
+uint8_t Orchestrator::getPetCount() {
+    return _petCount;
+}
+
+// First pet is pet 1 (assume pet 0 is local pet)
+PetMap Orchestrator::getPetMap(uint8_t index) {
+    index--;
+    if (index >= _petCount) return {};
+
+    uint8_t activeCount = 0;
+    for (uint8_t i = 0; i < FRIEND_PET_MAX; i++) {
+        if (_petsMap[i].petId != "") {
+            if (activeCount == index) {
+                return _petsMap[i];
+            }
+            activeCount++;
+        }
+    }
+    return {};
 }

@@ -69,7 +69,7 @@ typedef struct PetState {
 
 class Pet {
     Adafruit_SSD1306 *displayDriver;
-    QueueHandle_t voiceQueue;
+    QueueHandle_t *voiceQueue;
 
     uint8_t bodyId, headId, face = FACE_IDLE; // Look index
 
@@ -107,7 +107,7 @@ class Pet {
     bool isHighlighted = false;
     
     public:
-        Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceQueue);
+        Pet(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
         
         void update();
         void draw();

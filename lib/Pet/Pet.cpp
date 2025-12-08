@@ -1,6 +1,6 @@
 #include <Pet.hpp>
 
-Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDriver(display), voiceQueue(voiceMessageQueue) {
+Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t *voiceMessageQueue) : displayDriver(display), voiceQueue(voiceMessageQueue) {
     bodyId = random(0, BODY_COUNT);
     headId = random(0, HEAD_COUNT);
     blinkInterval = random(BLINK_MIN, BLINK_MAX);
@@ -195,7 +195,7 @@ void Pet::speak(int16_t toneOffset) {
     message.voiceLength = voiceLength;
     message.voice = voice;
     message.toneOffset = toneOffset;
-    xQueueSend(voiceQueue, &message, 10);
+    xQueueSend(*voiceQueue, &message, 10);
     Serial.println("Pet spoke!");
 }
 
@@ -249,7 +249,7 @@ void Pet::feed(uint8_t value) {
         VoiceMessage feeding;
         feeding.voiceLength = 1;
         feeding.voice = voice;
-        xQueueSend(voiceQueue, &feeding, 10);
+        xQueueSend(*voiceQueue, &feeding, 10);
     }
     
     satiation += value;

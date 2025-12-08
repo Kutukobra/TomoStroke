@@ -12,32 +12,34 @@
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
-#define VOICE_LENGTH_MAX 6
+#define FRIEND_PET_MAX 5
 
-typedef struct PetsMap {
+typedef struct PetMap {
     String petId;
     Pet* pet;
     uint16_t ttl;
-} PetsMap;
+} PetMap;
 
 class Orchestrator {
 public:
     Orchestrator(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
     void update();
+    void updatePet(String petId, PetState state);
 
-    Pet* addPet(String petId, uint16_t ttl, PetState initial);
-    bool removePet(String petId);
-    Pet* updatePet(String petId, uint16_t ttl, PetState state);
-
+    PetMap getPetMap(uint8_t index);
+    uint8_t getPetCount();
+    
 private:
-    PetsMap _petsMap[10];
+    PetMap _petsMap[FRIEND_PET_MAX];
     uint8_t _petCount;
-
+    
     Adafruit_SSD1306 *_display;
     QueueHandle_t *_voiceQueue;
-
-
+    
+    void _addPet(String petId, PetState initial);
+    bool _removePet(String petId);
     void _loadPetState(Pet* pet, PetState state);
+
 };
 
 #endif

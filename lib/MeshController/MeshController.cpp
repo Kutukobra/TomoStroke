@@ -63,8 +63,6 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         PetPacket p;
 
         p.mac = mac;
-        p.ttl = millis();
-
         int ptr = 0;
         p.state.looks.bodyId = data.substring(ptr).toInt();
         ptr = data.indexOf(' ', ptr) + 1;
