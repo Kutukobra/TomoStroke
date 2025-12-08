@@ -110,9 +110,9 @@ void MainLoop(void *) {
             if (currentPet >= petCount) {
                 currentPet = 0;
             }
-            // Serial.printf("Selecting: %d\n", currentPet);
         }
 
+        // Pet Selection
         if (currentPet == 0) {
             selectedPet = localPet;
         } else {

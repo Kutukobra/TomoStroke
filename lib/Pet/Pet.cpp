@@ -12,12 +12,6 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t *voiceMessageQueue) : displayD
     walkRate = random(1, 101);
 
     _generateVoice();
-
-    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, bodyId, face, blinkInterval, walkRate);
-    Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
-    // for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
-    //     Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
-    // }
 }
 
 PetLooks Pet::getLooks() {
@@ -40,7 +34,6 @@ void Pet::setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t 
     for (int i = 0; i < voiceLength * 2; i+=2) {
         this->voice[i] = voice[i];
         this->voice[i + 1] = voice[i + 1];
-        // Serial.printf("(%d, %d) ", this->voice[i], this->voice[i + 1]);
     }
 }
 
@@ -52,7 +45,6 @@ PetAttributes Pet::getAttributes() {
     attributes.voiceLength = this->voiceLength;
 
     for (int i = 0; i < voiceLength * 2; i+=2) {
-        // Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
         attributes.voice[i] = voice[i];
         attributes.voice[i + 1] = voice[i + 1];
     }
