@@ -116,7 +116,7 @@ class Pet {
         PetData getData();
         PetAttributes getAttributes();
         
-        void setLooks(uint8_t body, uint8_t head);
+        void setLooks(uint8_t headId, uint8_t bodyId);
         void setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength, uint16_t voice[]);
         void setData(int16_t satiation, int16_t happiness);
 

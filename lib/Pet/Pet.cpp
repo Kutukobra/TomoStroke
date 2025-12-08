@@ -26,9 +26,9 @@ PetLooks Pet::getLooks() {
     };
 } 
 
-void Pet::setLooks(uint8_t body, uint8_t head) {
-    this->bodyId = body;
+void Pet::setLooks(uint8_t head, uint8_t body) {
     this->headId = head;
+    this->bodyId = body;
 }
 
 void Pet::setAttributes(uint64_t speakInterval, uint64_t blinkInterval, uint8_t walkRate, uint8_t voiceLength, uint16_t voice[]) {
@@ -74,7 +74,7 @@ void Pet::update() {
     _happinessCheck();
     _satiationCheck();
     _blinkCheck();
-    _speakCheck();
+    // _speakCheck();
     _walkCheck();
 
     _faceCheck();

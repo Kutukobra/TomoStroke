@@ -41,6 +41,7 @@ void MeshController::broadcast(PetState pet) {
         voice += String(pet.attributes.voice[i]) + " " + String(pet.attributes.voice[i + 1]) + String(" ");
     }
 
+    Serial.println("Sending: " + out + voice + ";");
     mesh.sendBroadcast(out + voice + ";");
 }
 
@@ -64,9 +65,9 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
 
         p.mac = mac;
         int ptr = 0;
-        p.state.looks.bodyId = data.substring(ptr).toInt();
-        ptr = data.indexOf(' ', ptr) + 1;
         p.state.looks.headId = data.substring(ptr).toInt();
+        ptr = data.indexOf(' ', ptr) + 1;
+        p.state.looks.bodyId = data.substring(ptr).toInt();
 
         ptr = data.indexOf(' ', ptr) + 1;
         p.state.attributes.blinkInterval = data.substring(ptr).toInt();

@@ -9,7 +9,6 @@ Orchestrator::Orchestrator(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue)
 }
 
 void Orchestrator::update() {
-    Serial.println("==================");
     for (uint8_t i = 0; i < _petCount; i++) {
         if (millis() - _petsMap[i].ttl >= PET_TTL) {
             _removePet(_petsMap[i].petId);
@@ -17,14 +16,13 @@ void Orchestrator::update() {
             _petsMap[i].pet->update();
             _petsMap[i].pet->draw();
         }
-        Pet *p = _petsMap[i].pet;
-        Serial.printf("Pet %s\n\t-Looks: %d %d\n\t-Data: %d %d\n", 
-            _petsMap[i].petId, 
-            p->getLooks().headId, p->getLooks().bodyId,
-            p->getData().satiation, p->getData().happiness
-        );
+        // Pet *p = _petsMap[i].pet;
+        // Serial.printf("Pet %s\n\t-Looks: %d %d\n\t-Data: %d %d\n", 
+        //     _petsMap[i].petId, 
+        //     p->getLooks().headId, p->getLooks().bodyId,
+        //     p->getData().satiation, p->getData().happiness
+        // );
     }
-    Serial.println("==================");
 }
 
 void Orchestrator::updatePet(String petId, PetState state) {
@@ -67,7 +65,7 @@ bool Orchestrator::_removePet(String petId) {
 }
 
 void Orchestrator::_loadPetState(Pet* pet, PetState state) {
-    pet->setLooks(state.looks.bodyId, state.looks.headId);
+    pet->setLooks(state.looks.headId, state.looks.bodyId);
     pet->setAttributes(state.attributes.speakInterval, state.attributes.blinkInterval, state.attributes.walkRate, state.attributes.voiceLength, state.attributes.voice);
     pet->setData(state.data.satiation, state.data.happiness);
 }
