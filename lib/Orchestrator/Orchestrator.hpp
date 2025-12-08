@@ -18,26 +18,23 @@ typedef struct PetsMap {
     String petId;
     Pet* pet;
     uint16_t ttl;
-    PetState state;
 } PetsMap;
 
 class Orchestrator {
 public:
-    Orchestrator(Adafruit_SSD1306 &display, QueueHandle_t voiceQueue);
-    void update(uint64_t deltaTime);
+    Orchestrator(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
+    void update();
 
-    Pet* addPet(String petId, uint16_t ttl, PetState initial, Adafruit_SSD1306 &display, QueueHandle_t voiceQueue);
+    Pet* addPet(String petId, uint16_t ttl, PetState initial);
     bool removePet(String petId);
-    Pet* updatePet(String petId, uint16_t ttl, PetState state, Adafruit_SSD1306 &display, QueueHandle_t voiceQueue);
-
-    void clear();
+    Pet* updatePet(String petId, uint16_t ttl, PetState state);
 
 private:
     PetsMap _petsMap[10];
     uint8_t _petCount;
 
-    Adafruit_SSD1306 &_display;
-    QueueHandle_t _voiceQueue;
+    Adafruit_SSD1306 *_display;
+    QueueHandle_t *_voiceQueue;
 
 
     void _loadPetState(Pet* pet, PetState state);

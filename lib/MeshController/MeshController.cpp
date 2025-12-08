@@ -41,7 +41,7 @@ void MeshController::broadcast(PetState pet) {
         voice += String(pet.attributes.voice[i]) + " " + String(pet.attributes.voice[i + 1]) + String(" ");
     }
 
-    mesh.sendBroadcast(out + voice);
+    mesh.sendBroadcast(out + voice + ";");
 }
 
 void MeshController::feedFriend(const String &targetMac) {
@@ -63,7 +63,7 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         PetPacket p;
 
         p.mac = mac;
-        p.ttl = PET_TTL;
+        p.ttl = millis();
 
         int ptr = 0;
         p.state.looks.bodyId = data.substring(ptr).toInt();
@@ -98,7 +98,8 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         msg.replace(";", "");
         String target = msg;
         if (target == MeshController::GetOwnMac()) {
-            Serial.println("RECEIVED FEED");
+            uint8_t feedValue = FEEDING_VALUE;
+            xQueueSend(*friendFeedQueue, &feedValue, 10);
         }
     }
 }

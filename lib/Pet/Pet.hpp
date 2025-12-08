@@ -33,6 +33,8 @@ struct Vector2D {
 #define HUNGER_DECAY 2
 #define HUNGER_WALK 5
 
+#define FEEDING_VALUE 50
+
 #define MAX_HAPPINESS 1000
 #define HAPPINESS_RATE 8000
 #define HAPPINESS_DECAY 1

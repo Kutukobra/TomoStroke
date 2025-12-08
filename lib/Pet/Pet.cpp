@@ -13,11 +13,11 @@ Pet::Pet(Adafruit_SSD1306 *display, QueueHandle_t voiceMessageQueue) : displayDr
 
     _generateVoice();
 
-    Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, bodyId, face, blinkInterval, walkRate);
-    Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
-    for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
-        Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
-    }
+    // Serial.printf("- New Pet\n\tPosition: %d %d\n\tBody: %d\n\tFace: %d\n\tBlink Interval: %d\n\tWalk Rate: %d\n", position.x, position.y, bodyId, face, blinkInterval, walkRate);
+    // Serial.printf("\tVoice (Interval=%d):\n", speakInterval);
+    // for (uint8_t i = 0; i < voiceLength * 2; i += 2) {
+    //     Serial.printf("\t\tF: %d, D: %d\n", voice[i], voice[i + 1]);
+    // }
 }
 
 PetLooks Pet::getLooks() {
