@@ -52,11 +52,13 @@ void FriendFeedTask(void*) {
     }
 }
 
+
 void PetPacketTask(void*) {
     PetPacket petPacket;
     while (1) {
         if (xQueueReceive(inPetPacketQueue, &petPacket, portMAX_DELAY) == pdTRUE) {
             orchestrator->updatePet(petPacket.mac, petPacket.state);
+            localPet->addHappiness(HAPPINESS_SOCIALIZATION);
         }
     }
 }
@@ -99,22 +101,20 @@ void MainLoop(void *) {
     while (1) {
         display.clearDisplay();
         petCount = orchestrator->getPetCount();
-        if (currentPet > petCount) {
-            currentPet = 0;
-        }
-        
+    
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
             Serial.println("Button Pressed!");
             lastDebounce = millis();
             
             currentPet++;
-            if (currentPet > petCount) {
-                currentPet = 0;
-            }
+        }
+
+        if (currentPet > petCount) {
+            currentPet = 0;
         }
 
         selectedPetMap = orchestrator->getPetMap(currentPet);
-        selectedPet = localPet;
+        selectedPet = selectedPetMap.pet;
 
         if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();

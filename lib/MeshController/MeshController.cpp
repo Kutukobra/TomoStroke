@@ -37,7 +37,7 @@ void MeshController::broadcast(PetState pet) {
         pet.data.happiness + " ";
     
     String voice = "";
-    for (uint8_t i = 0; i < pet.attributes.voiceLength * 2; i += 2) {
+    for (uint8_t i = 0; i < VOICE_LENGTH_MAX * 2; i += 2) {
         voice += String(pet.attributes.voice[i]) + " " + String(pet.attributes.voice[i + 1]) + String(" ");
     }
 
@@ -82,7 +82,7 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         ptr = data.indexOf(' ', ptr) + 1;
         p.state.data.happiness = data.substring(ptr).toInt();
 
-        for (uint8_t i = 0; i < p.state.attributes.voiceLength * 2; i += 2) {
+        for (uint8_t i = 0; i < VOICE_LENGTH_MAX * 2; i += 2) {
             ptr = data.indexOf(' ', ptr) + 1;
             p.state.attributes.voice[i] = data.substring(ptr).toInt();
             p.state.attributes.voice[i + 1] = data.substring(ptr).toInt();

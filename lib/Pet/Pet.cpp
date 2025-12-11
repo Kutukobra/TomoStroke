@@ -244,6 +244,13 @@ void Pet::feed(uint8_t value) {
     if (satiation >= MAX_SATIATION) satiation = MAX_SATIATION;
 }
 
+void Pet::addHappiness(uint8_t value) {
+    happiness += value;
+    if (happiness > MAX_HAPPINESS) {
+        happiness = MAX_HAPPINESS;
+    } 
+}
+
 Vector2D Pet::GetRandomPosition() {
     int8_t x = random(SPRITE_WIDTH / 2, 129 - SPRITE_WIDTH / 2);
     int8_t y = random(SPRITE_HEIGHT / 2, 65 - SPRITE_HEIGHT / 2);

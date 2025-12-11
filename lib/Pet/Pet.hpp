@@ -38,6 +38,7 @@ struct Vector2D {
 #define MAX_HAPPINESS 1000
 #define HAPPINESS_RATE 8000
 #define HAPPINESS_DECAY 10
+#define HAPPINESS_SOCIALIZATION 5
 
 #define PET_TTL 3000
 
@@ -124,6 +125,7 @@ class Pet {
         void speak(int16_t toneOffset = 0);
 
         void feed(uint8_t value);
+        void addHappiness(uint8_t value);
 
         uint8_t getFace();
 
