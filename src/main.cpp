@@ -40,7 +40,7 @@ QueueHandle_t inFriendFeedQueue;
 
 MeshController meshController(&inPetPacketQueue, &inFriendFeedQueue);
 
-Orchestrator orchestrator(localPet, &display, &voiceQueue);
+Orchestrator *orchestrator;
 
 void FriendFeedTask(void*) {
     uint8_t feedingValue;
@@ -56,7 +56,7 @@ void PetPacketTask(void*) {
     PetPacket petPacket;
     while (1) {
         if (xQueueReceive(inPetPacketQueue, &petPacket, portMAX_DELAY) == pdTRUE) {
-            orchestrator.updatePet(petPacket.mac, petPacket.state);
+            orchestrator->updatePet(petPacket.mac, petPacket.state);
         }
     }
 }
@@ -93,13 +93,13 @@ void MainLoop(void *) {
 
     Pet *selectedPet = localPet;
     PetMap selectedPetMap;
-    uint8_t petCount; 
-    uint8_t currentPet = 0;
+    uint8_t petCount = 1; 
+    uint8_t currentPet = 1;
 
     while (1) {
         display.clearDisplay();
-        petCount = orchestrator.getPetCount();
-        if (currentPet >= petCount) {
+        petCount = orchestrator->getPetCount();
+        if (currentPet > petCount) {
             currentPet = 0;
         }
         
@@ -113,8 +113,8 @@ void MainLoop(void *) {
             }
         }
 
-        selectedPetMap = orchestrator.getPetMap(currentPet);
-        selectedPet = selectedPetMap.pet;
+        selectedPetMap = orchestrator->getPetMap(currentPet);
+        selectedPet = localPet;
 
         if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
@@ -139,7 +139,7 @@ void MainLoop(void *) {
             GUI::DrawAll();
         }
 
-        orchestrator.update();
+        orchestrator->update();
         
         display.display();
         vTaskDelay(pdMS_TO_TICKS(40));
@@ -169,6 +169,9 @@ void setup()
     inFriendFeedQueue = xQueueCreate(5, sizeof(uint8_t));
 
     localPet = new Pet(&display, &voiceQueue);
+
+    // Pastikan ini setelah localPet
+    orchestrator = new Orchestrator(localPet, &display, &voiceQueue);
 
     meshController.setup();
 

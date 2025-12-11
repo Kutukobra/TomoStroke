@@ -4,7 +4,6 @@ Orchestrator::Orchestrator(Pet *localPet, Adafruit_SSD1306 *display, QueueHandle
     : _display(display), _voiceQueue(voiceQueue) {
     _petCount = 1;
     _petsMap[0].pet = localPet;
-    _petsMap[0].petId = MeshController::GetOwnMac();
 
     for (uint8_t i = 1; i < PET_COUNT; i++) {
         _petsMap[i].pet = new Pet(display, voiceQueue);
@@ -71,7 +70,6 @@ uint8_t Orchestrator::getPetCount() {
     return _petCount;
 }
 
-// First pet is pet 1 (assume pet 0 is local pet)
 PetMap Orchestrator::getPetMap(uint8_t index) {
     if (index >= _petCount) return _petsMap[0];
 
