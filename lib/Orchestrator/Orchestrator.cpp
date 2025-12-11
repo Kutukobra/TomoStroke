@@ -37,10 +37,11 @@ void Orchestrator::updatePet(String petId, PetState state) {
 
 void Orchestrator::_addPet(String petId, PetState initial) {
     if (_petCount >= PET_COUNT - 1) return;
-    Serial.printf("Adding new pet: %d %d\n", initial.looks.headId, initial.looks.bodyId);
-
+    
     _petsMap[_petCount].petId = petId;
     _petsMap[_petCount].ttl = millis();
+    
+    Serial.printf("Adding new pet: %d %d (%d)\n", initial.looks.headId, initial.looks.bodyId, _petsMap[_petCount].ttl);
 
     Pet *pet = _petsMap[_petCount].pet;
     pet->setLooks(initial.looks.headId, initial.looks.bodyId);
@@ -52,7 +53,7 @@ void Orchestrator::_addPet(String petId, PetState initial) {
 }
 
 bool Orchestrator::_removePet(uint8_t index) {
-    Serial.println("Removing pet: " + index);    
+    Serial.printf("Removing pet %d (%d)\n",index, millis());    
 
     if (index >= PET_COUNT) return false;
 
