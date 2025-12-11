@@ -116,7 +116,7 @@ void MainLoop(void *) {
         selectedPetMap = orchestrator->getPetMap(currentPet);
         selectedPet = selectedPetMap.pet;
 
-        if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
+        if (currentPet < petCount && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
             lastVibration = millis();
             selectedPet->feed(FEEDING_VALUE);
             if (selectedPet != localPet) {
