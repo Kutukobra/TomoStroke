@@ -85,6 +85,7 @@ void MeshController::receivedCallback(uint32_t from, String &msg) {
         for (uint8_t i = 0; i < VOICE_LENGTH_MAX * 2; i += 2) {
             ptr = data.indexOf(' ', ptr) + 1;
             p.state.attributes.voice[i] = data.substring(ptr).toInt();
+            ptr = data.indexOf(' ', ptr) + 1;
             p.state.attributes.voice[i + 1] = data.substring(ptr).toInt();
         }
 

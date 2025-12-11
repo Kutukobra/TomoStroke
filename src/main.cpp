@@ -82,6 +82,7 @@ void VoiceTask(void*) {
         if (xQueueReceive(voiceQueue, &message, portMAX_DELAY) == pdTRUE) {
             for (uint8_t i = 0; i < message.voiceLength * 2; i += 2) {
                 tone(BUZZER, message.voice[i] + message.toneOffset, message.voice[i + 1]);
+                Serial.printf("%d %d\n", message.voice[i], message.voice[i + 1]);
                 vTaskDelay(message.voice[i + 1]);
             }
         }
