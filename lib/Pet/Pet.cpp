@@ -222,14 +222,6 @@ bool Pet::isHungry() {
     return hungry;
 }
 
-uint8_t Pet::getFace() {
-    return face;
-}
-
-bool Pet::isHungry() {
-    return hungry;
-}
-
 void Pet::_satiationReduction(uint16_t value) {
     satiation -= value;
     if (satiation <= 1) satiation = 1;

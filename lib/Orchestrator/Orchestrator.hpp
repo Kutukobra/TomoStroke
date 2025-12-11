@@ -3,6 +3,7 @@
 
 #include <Orchestrator.hpp>
 #include <Pet.hpp>
+#include <MeshController.hpp>
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -12,7 +13,7 @@
 #define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
-#define FRIEND_PET_MAX 5
+#define PET_COUNT 10
 
 typedef struct PetMap {
     String petId;
@@ -22,7 +23,7 @@ typedef struct PetMap {
 
 class Orchestrator {
 public:
-    Orchestrator(Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
+    Orchestrator(Pet *localPet, Adafruit_SSD1306 *display, QueueHandle_t *voiceQueue);
     void update();
     void updatePet(String petId, PetState state);
 
@@ -30,14 +31,14 @@ public:
     uint8_t getPetCount();
     
 private:
-    PetMap _petsMap[FRIEND_PET_MAX];
+    PetMap _petsMap[PET_COUNT];
     uint8_t _petCount;
     
     Adafruit_SSD1306 *_display;
     QueueHandle_t *_voiceQueue;
     
     void _addPet(String petId, PetState initial);
-    bool _removePet(String petId);
+    bool _removePet(uint8_t index);
 
 };
 

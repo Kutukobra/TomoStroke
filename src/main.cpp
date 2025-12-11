@@ -40,7 +40,7 @@ QueueHandle_t inFriendFeedQueue;
 
 MeshController meshController(&inPetPacketQueue, &inFriendFeedQueue);
 
-Orchestrator orchestrator(&display, &voiceQueue);
+Orchestrator orchestrator(localPet, &display, &voiceQueue);
 
 void FriendFeedTask(void*) {
     uint8_t feedingValue;
@@ -97,30 +97,10 @@ void MainLoop(void *) {
     uint8_t currentPet = 0;
 
     while (1) {
-<<<<<<< HEAD
-        hungerBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getSatiation()); // Satu siklus ga ada yang dihighlight samsek
-        happinessBar.setCapacity(pets[currentPet >= PET_COUNT ? 0 : currentPet]->getHappiness()); 
-
-        if (currentPet != PET_COUNT) {
-            uint8_t face = pets[currentPet]->getFace();
-
-            uint8_t faceIcon;
-            if (face == FACE_HAPPY) {
-                faceIcon = ICON_HAPPY;
-            } else if (face == FACE_SAD) {
-                faceIcon = ICON_SAD;
-            } else if (face == FACE_BLINK) {
-                faceIcon = ICON_BORED;
-            }
-            happinessIcon.setIcon(faceIcon);
-
-            hungerIcon.setIcon(pets[currentPet]->isHungry() ? ICON_HUNGRY : ICON_SATIATED);
-=======
         display.clearDisplay();
-        petCount = orchestrator.getPetCount() + 1;
+        petCount = orchestrator.getPetCount();
         if (currentPet >= petCount) {
             currentPet = 0;
->>>>>>> finalization
         }
         
         if (digitalRead(BUTTON_A) == LOW && millis() - lastDebounce > INPUT_DEBOUNCE) {
@@ -128,26 +108,15 @@ void MainLoop(void *) {
             lastDebounce = millis();
             
             currentPet++;
-            if (currentPet >= petCount) {
+            if (currentPet > petCount) {
                 currentPet = 0;
             }
         }
-<<<<<<< HEAD
-    
-        if (currentPet != PET_COUNT && digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
-            Serial.println("Device Shaken!");
-=======
 
-        // Pet Selection
-        if (currentPet == 0) {
-            selectedPet = localPet;
-        } else {
-            selectedPetMap = orchestrator.getPetMap(currentPet);
-            selectedPet = selectedPetMap.pet;
-        }
+        selectedPetMap = orchestrator.getPetMap(currentPet);
+        selectedPet = selectedPetMap.pet;
 
         if (digitalRead(VIBRATION_SENSOR) == HIGH && millis() - lastVibration > INPUT_DEBOUNCE) {
->>>>>>> finalization
             lastVibration = millis();
             selectedPet->feed(FEEDING_VALUE);
             if (selectedPet != localPet) {
@@ -155,9 +124,11 @@ void MainLoop(void *) {
             }
         }
         
-        { // GUI Update
+        if (currentPet < petCount) { // GUI Update
+            selectedPet->drawHighlight();
+
             PetData currentData;
-            currentData = selectedPet->getData(); // Satu siklus ga ada yang dihighlight samsek
+            currentData = selectedPet->getData();
             hungerBar.setCapacity(currentData.satiation); 
             happinessBar.setCapacity(currentData.happiness); 
 
@@ -165,16 +136,11 @@ void MainLoop(void *) {
             happinessIcon.setIcon(Icon::FaceToIcon(face));
 
             hungerIcon.setIcon(selectedPet->isHungry() ? ICON_HUNGRY : ICON_SATIATED);
-
             GUI::DrawAll();
         }
 
-        localPet->update();
         orchestrator.update();
         
-        localPet->draw();
-
-        selectedPet->drawHighlight();
         display.display();
         vTaskDelay(pdMS_TO_TICKS(40));
     }
