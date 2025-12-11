@@ -18,7 +18,7 @@
 typedef struct PetMap {
     String petId;
     Pet* pet;
-    uint16_t ttl;
+    uint64_t ttl;
 } PetMap;
 
 class Orchestrator {
