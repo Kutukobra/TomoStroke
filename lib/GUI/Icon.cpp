@@ -21,5 +21,7 @@ uint8_t Icon::FaceToIcon(uint8_t face) {
             return ICON_SAD;
         case FACE_BLINK:
             return ICON_BORED;
+        default:
+            return ICON_HAPPY;
     }
 }
